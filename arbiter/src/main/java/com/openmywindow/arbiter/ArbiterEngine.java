@@ -2,13 +2,17 @@ package com.openmywindow.arbiter;
 
 import com.openmywindow.arbiter.domain.DailyWeather;
 import com.openmywindow.arbiter.domain.Window;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ArbiterEngine {
 
+	private static final Logger log = LoggerFactory.getLogger(ArbiterEngine.class);
+
 	public Window determineWindowStatus(DailyWeather dailyWeather) {
-		System.out.println("Current temp = " + dailyWeather.getCurrentTemp());
-		System.out.println("High temp = " + dailyWeather.getHighTemp());
-		System.out.println("Low temp = " + dailyWeather.getLowTemp());
+		log.info("Current temp = " + dailyWeather.getCurrentTemp());
+		log.info("High temp = " + dailyWeather.getHighTemp());
+		log.info("Low temp = " + dailyWeather.getLowTemp());
 
 		if (dailyWeather.getHighTemp() < 65) {
 			return new Window("closed - too cold");
