@@ -1,8 +1,8 @@
 package com.openmywindow.arbiter.controller;
 
 import com.openmywindow.arbiter.ArbiterEngine;
-import com.openmywindow.arbiter.domain.DailyWeather;
-import com.openmywindow.arbiter.domain.Window;
+import com.openmywindow.arbiter.record.DailyWeatherRecord;
+import com.openmywindow.arbiter.record.WindowRecord;
 import com.openmywindow.arbiter.service.WeatherService;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,13 +27,13 @@ public class ArbiterController {
 	}
 
 	@GetMapping("sampleWindow")
-	public Window getSample() {
-		return new Window("sampleStatus");
+	public WindowRecord getSample() {
+		return new WindowRecord("sampleStatus");
 	}
 
 	@GetMapping("myWindow")
-	public Window makeCall(@RequestParam(name = "zipcode", defaultValue = "15108") String zipcode) {
-		DailyWeather dailyWeather = weatherService.getDailyWeather(zipcode);
+	public WindowRecord makeCall(@RequestParam(name = "zipcode", defaultValue = "15108") String zipcode) {
+		DailyWeatherRecord dailyWeather = weatherService.getDailyWeather(zipcode);
 		return engine.determineWindowStatus(dailyWeather);
 	}
 }

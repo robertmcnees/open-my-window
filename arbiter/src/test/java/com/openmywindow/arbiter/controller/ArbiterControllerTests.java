@@ -1,7 +1,7 @@
 package com.openmywindow.arbiter.controller;
 
-import com.openmywindow.arbiter.domain.DailyWeather;
-import com.openmywindow.arbiter.domain.Window;
+import com.openmywindow.arbiter.record.DailyWeatherRecord;
+import com.openmywindow.arbiter.record.WindowRecord;
 import com.openmywindow.arbiter.service.WeatherService;
 import org.junit.jupiter.api.Test;
 
@@ -36,9 +36,9 @@ public class ArbiterControllerTests {
 
 	@Test
 	public void testWithMockWeatherService() {
-		when(weatherService.getDailyWeather(anyString())).thenReturn(new DailyWeather(60, 81, 54));
-		Window window = this.restTemplate.getForObject("http://localhost:" + port + "/arbiter/myWindow", Window.class);
-		assertEquals("open - cold now, hot later", window.getStatus());
+		when(weatherService.getDailyWeather(anyString())).thenReturn(new DailyWeatherRecord(60, 81, 54));
+		WindowRecord window = this.restTemplate.getForObject("http://localhost:" + port + "/arbiter/myWindow", WindowRecord.class);
+		assertEquals("open - cold now, hot later", window.status());
 	}
 
 }

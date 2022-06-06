@@ -2,7 +2,7 @@ package com.openmywindow.arbiter.service;
 
 import java.util.Random;
 
-import com.openmywindow.arbiter.domain.DailyWeather;
+import com.openmywindow.arbiter.record.DailyWeatherRecord;
 
 public class MockWeatherService implements WeatherService {
 
@@ -13,13 +13,13 @@ public class MockWeatherService implements WeatherService {
 	private final Random random = new Random();
 
 	@Override
-	public DailyWeather getDailyWeather(String zipCode) {
+	public DailyWeatherRecord getDailyWeather(String zipCode) {
 		Integer highTemp = random.nextInt(MAX_HIGH - MIN_HIGH) + MIN_HIGH;
 		Integer lowTemp = random.nextInt(MAX_LOW - MIN_LOW) + MIN_LOW;
 
 		Integer currentTemp = random.nextInt(highTemp - lowTemp) + lowTemp;
 
 
-		return new DailyWeather(currentTemp, highTemp, lowTemp);
+		return new DailyWeatherRecord(currentTemp, highTemp, lowTemp);
 	}
 }

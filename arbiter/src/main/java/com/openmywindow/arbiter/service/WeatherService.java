@@ -1,8 +1,8 @@
 package com.openmywindow.arbiter.service;
 
-import com.openmywindow.arbiter.domain.DailyWeather;
+import com.openmywindow.arbiter.record.DailyWeatherRecord;
 
 public interface WeatherService {
 
-	DailyWeather getDailyWeather(String zipCode);
+	DailyWeatherRecord getDailyWeather(String zipCode);
 }
