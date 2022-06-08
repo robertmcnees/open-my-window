@@ -1,5 +1,6 @@
 package com.openmywindow.geocode.service;
 
+import com.openmywindow.geocode.configuration.OpenWeatherVaultConfiguration;
 import com.openmywindow.geocode.record.GeocodeResponse;
 import com.openmywindow.geocode.record.OpenWeatherGeocodeResponse;
 import org.slf4j.Logger;
@@ -9,12 +10,13 @@ import org.springframework.web.client.RestTemplate;
 
 public class GeocodeService {
 
-	private static final String OPEN_WEATHER_API_KEY = "<private>";
+	private final String OPEN_WEATHER_API_KEY;
 	private static final Logger log = LoggerFactory.getLogger(GeocodeService.class);
 	private final RestTemplate restTemplate;
 
-	public GeocodeService(RestTemplate restTemplate) {
+	public GeocodeService(RestTemplate restTemplate, OpenWeatherVaultConfiguration openWeatherVaultConfiguration) {
 		this.restTemplate = restTemplate;
+		OPEN_WEATHER_API_KEY = openWeatherVaultConfiguration.getApikey();
 	}
 
 	public GeocodeResponse geocodeZipcode(String zipcode) {

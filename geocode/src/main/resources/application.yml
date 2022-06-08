@@ -1,0 +1,16 @@
+spring:
+  rsocket:
+    server:
+      port: 8181
+  cloud:
+    vault:
+      token: 00000000-0000-0000-0000-000000000000
+      host: localhost
+      port: 8200
+      scheme: http
+  application:
+    name: geocode
+  config:
+    import: vault://
+server:
+  port: 8888

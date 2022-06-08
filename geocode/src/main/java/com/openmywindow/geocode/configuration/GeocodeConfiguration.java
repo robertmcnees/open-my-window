@@ -16,7 +16,7 @@ public class GeocodeConfiguration {
 	}
 
 	@Bean
-	public GeocodeService geocodeService(RestTemplate restTemplate) {
-		return new GeocodeService(restTemplate);
+	public GeocodeService geocodeService(RestTemplate restTemplate, OpenWeatherVaultConfiguration openWeatherVaultConfiguration) {
+		return new GeocodeService(restTemplate, openWeatherVaultConfiguration);
 	}
 }
