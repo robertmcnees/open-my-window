@@ -1,5 +1,6 @@
 package com.openmywindow.geocode.configuration;
 
+import com.openmywindow.geocode.repository.GeocodeRepository;
 import com.openmywindow.geocode.service.GeocodeService;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -16,7 +17,7 @@ public class GeocodeConfiguration {
 	}
 
 	@Bean
-	public GeocodeService geocodeService(RestTemplate restTemplate, OpenWeatherVaultConfiguration openWeatherVaultConfiguration) {
-		return new GeocodeService(restTemplate, openWeatherVaultConfiguration);
+	public GeocodeService geocodeService(RestTemplate restTemplate, OpenWeatherVaultConfiguration openWeatherVaultConfiguration, GeocodeRepository geocodeRepository) {
+		return new GeocodeService(restTemplate, openWeatherVaultConfiguration, geocodeRepository);
 	}
 }
