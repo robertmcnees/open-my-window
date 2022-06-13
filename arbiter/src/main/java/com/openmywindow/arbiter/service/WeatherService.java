@@ -4,5 +4,5 @@ import com.openmywindow.arbiter.record.DailyWeatherRecord;
 
 public interface WeatherService {
 
-	DailyWeatherRecord getDailyWeather(String zipCode);
+	DailyWeatherRecord getDailyWeather(String postalCode);
 }

@@ -6,6 +6,6 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface GeocodeRepository extends CrudRepository<GeocodeEntity, String> {
 
-	GeocodeEntity findByZipcode(String zipcode);
+	GeocodeEntity findByPostalCode(String postalCode);
 
 }

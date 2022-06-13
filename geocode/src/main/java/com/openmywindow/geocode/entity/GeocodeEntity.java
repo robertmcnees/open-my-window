@@ -7,24 +7,26 @@ import javax.persistence.Id;
 public class GeocodeEntity {
 
 	@Id
-	private String zipcode;
+	private String postalCode;
+
 	private Double lat;
 	private Double lon;
 
-	protected GeocodeEntity() {}
+	protected GeocodeEntity() {
+	}
 
-	public GeocodeEntity(String zipcode, Double lat, Double lon) {
-		this.zipcode = zipcode;
+	public GeocodeEntity(String postalCode, Double lat, Double lon) {
+		this.postalCode = postalCode;
 		this.lat = lat;
 		this.lon = lon;
 	}
 
-	public String getZipcode() {
-		return zipcode;
+	public String getPostalCode() {
+		return postalCode;
 	}
 
-	public void setZipcode(String zipcode) {
-		this.zipcode = zipcode;
+	public void setPostalCode(String postalCode) {
+		this.postalCode = postalCode;
 	}
 
 	public Double getLat() {

@@ -32,8 +32,8 @@ public class ArbiterController {
 	}
 
 	@GetMapping("myWindow")
-	public WindowRecord makeCall(@RequestParam(name = "zipcode", defaultValue = "15108") String zipcode) {
-		DailyWeatherRecord dailyWeather = weatherService.getDailyWeather(zipcode);
+	public WindowRecord makeCall(@RequestParam(name = "postalCode", defaultValue = "15108") String postalCode) {
+		DailyWeatherRecord dailyWeather = weatherService.getDailyWeather(postalCode);
 		return engine.determineWindowStatus(dailyWeather);
 	}
 }

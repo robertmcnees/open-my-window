@@ -24,8 +24,8 @@ public class GeocodeController {
 
 	@MessageMapping("geocode")
 	GeocodeResponse geocode(GeocodeRequest request) {
-		log.info("geocode called with " + request.zipcode());
-		return geocodeService.geocodeZipcode(request.zipcode());
+		log.info("geocode called with " + request.postalCode());
+		return geocodeService.geocodeZipcode(request.postalCode());
 
 	}
 }
