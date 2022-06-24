@@ -1,18 +1,23 @@
 package com.openmywindow.arbiter.config;
 
-import com.openmywindow.arbiter.service.MockWeatherService;
-import com.openmywindow.arbiter.service.WeatherService;
+import com.openmywindow.arbiter.service.GeocodeService;
 
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 
 
 @Configuration
 public class ArbiterConfiguration {
 
 	@Bean
-	public WeatherService mockWeatherService() {
-		return new MockWeatherService();
+	public RestTemplate restTemplate(RestTemplateBuilder builder) {
+		return builder.build();
 	}
 
+	@Bean
+	public GeocodeService getGeocodeService(RestTemplate restTemplate) {
+		return new GeocodeService(restTemplate);
+	}
 }

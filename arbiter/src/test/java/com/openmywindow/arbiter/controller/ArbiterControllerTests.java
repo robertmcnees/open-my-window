@@ -34,11 +34,5 @@ public class ArbiterControllerTests {
 		assertEquals(response, "hello window");
 	}
 
-	@Test
-	public void testWithMockWeatherService() {
-		when(weatherService.getDailyWeather(anyString())).thenReturn(new DailyWeatherRecord(60, 81, 54));
-		WindowRecord window = this.restTemplate.getForObject("http://localhost:" + port + "/arbiter/myWindow", WindowRecord.class);
-		assertEquals("open - cold now, hot later", window.status());
-	}
 
 }
