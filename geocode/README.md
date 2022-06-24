@@ -10,7 +10,7 @@ The service uses RSocket as supported by Spring.  To test the service using the 
 
 Using that client an example call would be:
 
-```rsc tcp://localhost:8181 --route geocode -d'{"postalcode":"12345"}'```
+```rsc tcp://localhost:8181 --route geocode -d'{"postalCode":"12345"}'```
 
 ## Vault
 
