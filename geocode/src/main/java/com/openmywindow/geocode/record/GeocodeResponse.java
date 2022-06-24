@@ -1,3 +1,3 @@
 package com.openmywindow.geocode.record;
 
-public record GeocodeResponse(Double latitude, Double longitude) { }
+public record GeocodeResponse(Double lat, Double lon) { }

@@ -23,7 +23,7 @@ public class GeocodeService {
 		this.geocodeRepository = geocodeRepository;
 	}
 
-	public GeocodeResponse geocodeZipcode(String postalCode) {
+	public GeocodeResponse geocodePostalCode(String postalCode) {
 		GeocodeEntity cached = findCachedValue(postalCode);
 		if (cached == null) {
 			log.info("no cache for " + postalCode + ", calling open weather api");

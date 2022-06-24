@@ -1,7 +1,4 @@
 spring:
-  rsocket:
-    server:
-      port: 8181
   cloud:
     vault:
       token: 00000000-0000-0000-0000-000000000000
@@ -13,4 +10,4 @@ spring:
   config:
     import: vault://
 server:
-  port: 8888
+  port: 8081
