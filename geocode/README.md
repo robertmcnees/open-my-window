@@ -4,14 +4,6 @@ The purpose of geocode is to take a postal code and return lat long coordinates 
 
 # Tech
 
-## RSocket
-
-The service uses RSocket as supported by Spring.  To test the service using the command line, you can use the [rsc client here](https://github.com/making/rsc).
-
-Using that client an example call would be:
-
-```rsc tcp://localhost:8181 --route geocode -d'{"postalCode":"12345"}'```
-
 ## Vault
 
 The API key for OpenWeather is stored in Vault.  While setting up vault is beyond this documentation, I followed [this guide](https://spring.io/guides/gs/vault-config/) for the integration.
