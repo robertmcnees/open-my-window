@@ -1,0 +1,28 @@
+= Overview
+
+The arbiter module is the decision maker.  It will take input from various sources and have the logic to determine if a window should be open or closed.
+
+= Docker
+
+The project can built with Docker with the command
+
+[source,console]
+----
+docker build -t openmywindow/arbiter .
+----
+
+And the project can be run locally with the command
+
+[source,console]
+----
+docker container run --name arbiter -p 8080:8080 openmywindow/arbiter
+----
+
+= Azure
+
+The project is configured to push the docker image to an Azure container registry.
+
+[source, console]
+----
+az acr login && mvn compile jib:build
+----
