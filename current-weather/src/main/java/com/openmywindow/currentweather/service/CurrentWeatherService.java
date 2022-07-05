@@ -1,23 +1,23 @@
 package com.openmywindow.currentweather.service;
 
-import com.openmywindow.currentweather.configuration.OpenWeatherVaultConfiguration;
 import com.openmywindow.currentweather.helper.Conversion;
 import com.openmywindow.currentweather.record.CurrentWeatherResponse;
 import com.openmywindow.currentweather.record.OpenWeatherApiCurrentWeatherResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestTemplate;
 
 public class CurrentWeatherService {
 
 	private static final Logger log = LoggerFactory.getLogger(CurrentWeatherService.class);
-	private final String OPEN_WEATHER_API_KEY;
 	private final RestTemplate restTemplate;
+	@Value("${openweatherapi.apikey}")
+	private String OPEN_WEATHER_API_KEY = "secret-api-key";
 
-	public CurrentWeatherService(RestTemplate restTemplate, OpenWeatherVaultConfiguration vaultConfiguration) {
+	public CurrentWeatherService(RestTemplate restTemplate) {
 		this.restTemplate = restTemplate;
-		OPEN_WEATHER_API_KEY = vaultConfiguration.getApikey();
 	}
 
 	public CurrentWeatherResponse getOpenWeatherApiCurrentWeather(Double lat, Double lon) {

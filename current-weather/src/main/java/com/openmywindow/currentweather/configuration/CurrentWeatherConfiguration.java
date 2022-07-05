@@ -16,7 +16,7 @@ public class CurrentWeatherConfiguration {
 	}
 
 	@Bean
-	public CurrentWeatherService currentWeatherService(RestTemplate restTemplate, OpenWeatherVaultConfiguration openWeatherVaultConfiguration) {
-		return new CurrentWeatherService(restTemplate, openWeatherVaultConfiguration);
+	public CurrentWeatherService currentWeatherService(RestTemplate restTemplate) {
+		return new CurrentWeatherService(restTemplate);
 	}
 }
