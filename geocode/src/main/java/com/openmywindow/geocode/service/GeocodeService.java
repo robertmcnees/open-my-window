@@ -1,6 +1,5 @@
 package com.openmywindow.geocode.service;
 
-import com.openmywindow.geocode.configuration.OpenWeatherVaultConfiguration;
 import com.openmywindow.geocode.entity.GeocodeEntity;
 import com.openmywindow.geocode.record.GeocodeResponse;
 import com.openmywindow.geocode.record.OpenWeatherGeocodeResponse;
@@ -8,18 +7,20 @@ import com.openmywindow.geocode.repository.GeocodeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestTemplate;
 
 public class GeocodeService {
 
 	private static final Logger log = LoggerFactory.getLogger(GeocodeService.class);
-	private final String OPEN_WEATHER_API_KEY;
 	private final RestTemplate restTemplate;
 	private final GeocodeRepository geocodeRepository;
 
-	public GeocodeService(RestTemplate restTemplate, OpenWeatherVaultConfiguration openWeatherVaultConfiguration, GeocodeRepository geocodeRepository) {
+	@Value("${openweatherapi.apikey}")
+	private String OPEN_WEATHER_API_KEY = "keep-it-secret-keep-it-safe";
+
+	public GeocodeService(RestTemplate restTemplate, GeocodeRepository geocodeRepository) {
 		this.restTemplate = restTemplate;
-		OPEN_WEATHER_API_KEY = openWeatherVaultConfiguration.getApikey();
 		this.geocodeRepository = geocodeRepository;
 	}
 
