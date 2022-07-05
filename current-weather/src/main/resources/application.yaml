@@ -1,4 +1,11 @@
+server:
+  port: 8082
+
+---
+
 spring:
+  profiles:
+    active: dev
   cloud:
     vault:
       token: 00000000-0000-0000-0000-000000000000
@@ -9,5 +16,3 @@ spring:
     name: current-weather
   config:
     import: vault://
-server:
-  port: 8082
