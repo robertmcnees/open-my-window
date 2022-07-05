@@ -1,6 +1,6 @@
 package com.openmywindow.currentweather.configuration;
 
-import service.CurrentWeatherService;
+import com.openmywindow.currentweather.service.CurrentWeatherService;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;

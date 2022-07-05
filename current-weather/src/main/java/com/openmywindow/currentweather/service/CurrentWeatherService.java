@@ -1,4 +1,4 @@
-package service;
+package com.openmywindow.currentweather.service;
 
 import com.openmywindow.currentweather.configuration.OpenWeatherVaultConfiguration;
 import com.openmywindow.currentweather.helper.Conversion;

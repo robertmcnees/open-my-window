@@ -3,7 +3,7 @@ package com.openmywindow.currentweather.controller;
 import com.openmywindow.currentweather.record.CurrentWeatherResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import service.CurrentWeatherService;
+import com.openmywindow.currentweather.service.CurrentWeatherService;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
