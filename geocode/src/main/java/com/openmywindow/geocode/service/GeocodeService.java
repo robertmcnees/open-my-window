@@ -16,7 +16,7 @@ public class GeocodeService {
 	private final RestTemplate restTemplate;
 	private final GeocodeRepository geocodeRepository;
 
-	@Value("${openweatherapi.apikey}")
+	@Value("${openweatherapikey}")
 	private String OPEN_WEATHER_API_KEY = "keep-it-secret-keep-it-safe";
 
 	public GeocodeService(RestTemplate restTemplate, GeocodeRepository geocodeRepository) {
@@ -25,6 +25,7 @@ public class GeocodeService {
 	}
 
 	public GeocodeResponse geocodePostalCode(String postalCode) {
+		log.info("Open weather API key = " + OPEN_WEATHER_API_KEY);
 		GeocodeEntity cached = findCachedValue(postalCode);
 		if (cached == null) {
 			log.info("no cache for " + postalCode + ", calling open weather api");
