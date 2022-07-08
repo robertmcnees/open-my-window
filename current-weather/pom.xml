@@ -41,7 +41,10 @@
 	</dependencyManagement>
 	<profiles>
 		<profile>
-			<id>local</id>
+			<id>localvault</id>
+			<properties>
+				<spring.active.profiles>localvault</spring.active.profiles>
+			</properties>
 			<dependencies>
 				<dependency>
 					<groupId>org.springframework.cloud</groupId>
