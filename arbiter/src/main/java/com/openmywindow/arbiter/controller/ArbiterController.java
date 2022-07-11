@@ -33,6 +33,12 @@ public class ArbiterController {
 		return "hello window";
 	}
 
+	@GetMapping("coordinates")
+	public String getCoordinates(@RequestParam String postalCode) {
+		GeocodeCoordinates coordinates = geocodeService.getGeocodeCoordinates(postalCode);
+		return ("lat=" + coordinates.lat() + " : lon=" + coordinates.lon());
+	}
+
 	@GetMapping("window")
 	public WindowRecord makeCall(@RequestParam String postalCode) {
 		GeocodeCoordinates coordinates = geocodeService.getGeocodeCoordinates(postalCode);

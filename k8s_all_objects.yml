@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: omw-arbiter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: omw-arbiter
+  template:
+    metadata:
+      labels:
+        app: omw-arbiter
+    spec:
+      containers:
+        - name: geocode
+          image: rjmsandbox.azurecr.io/arbiter:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: omw-arbiter
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: omw-arbiter
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: omw-geocode
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: omw-geocode
+  template:
+    metadata:
+      labels:
+        app: omw-geocode
+    spec:
+      containers:
+        - name: geocode
+          env:
+            - name: SECRET_OPENWEATHER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: omw-openweather-apikey
+                  key: openweatherapikey
+                  optional: false
+          image: rjmsandbox.azurecr.io/geocode:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: omw-geocode
+spec:
+  ports:
+    - port: 80
+      targetPort: 8081
+  selector:
+    app: omw-geocode
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: omw-current-weather
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: omw-current-weather
+  template:
+    metadata:
+      labels:
+        app: omw-current-weather
+    spec:
+      containers:
+        - name: current-weather
+          env:
+            - name: SECRET_OPENWEATHER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: omw-openweather-apikey
+                  key: openweatherapikey
+                  optional: false
+          image: rjmsandbox.azurecr.io/current-weather:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: omw-currentweather
+spec:
+  ports:
+    - port: 80
+      targetPort: 8082
+  selector:
+    app: omw-current-weather

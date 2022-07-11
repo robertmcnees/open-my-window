@@ -52,13 +52,5 @@
 		</plugins>
 	</build>
 
-	<profiles>
-		<profile>
-			<id>local</id>
-			<properties>
-				<spring.profiles.active>local</spring.profiles.active>
-			</properties>
-		</profile>
-	</profiles>
 
 </project>

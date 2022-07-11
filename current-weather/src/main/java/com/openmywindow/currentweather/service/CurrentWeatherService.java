@@ -14,8 +14,8 @@ public class CurrentWeatherService {
 	private static final Logger log = LoggerFactory.getLogger(CurrentWeatherService.class);
 	private final RestTemplate restTemplate;
 
-	@Value("${openweatherapikey}")
-	private String OPEN_WEATHER_API_KEY = "secret-api-key";
+	@Value("${SECRET_OPENWEATHER_API_KEY:defaultValue}")
+	private String OPEN_WEATHER_API_KEY;
 
 	public CurrentWeatherService(RestTemplate restTemplate) {
 		this.restTemplate = restTemplate;

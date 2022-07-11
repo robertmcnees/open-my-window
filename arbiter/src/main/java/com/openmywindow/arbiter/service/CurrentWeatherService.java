@@ -9,14 +9,14 @@ public class CurrentWeatherService {
 
 	private final RestTemplate restTemplate;
 
-	@Value("${openweatherserviceurl")
-	private String openWeatherServiceUrl;
+	@Value("${currentweatherserviceurl:omw-currentweather}")
+	private String currentWeatherServiceUrl;
 
 	public CurrentWeatherService(RestTemplate restTemplate) {
 		this.restTemplate = restTemplate;
 	}
 
 	public CurrentWeatherRecord getCurrentWeather(Double lat, Double lon) {
-		return restTemplate.getForObject("http://" + openWeatherServiceUrl + "/current/currentWeather?lat="+lat+"&lon="+lon, CurrentWeatherRecord.class);
+		return restTemplate.getForObject("http://" + currentWeatherServiceUrl + "/current/currentWeather?lat="+lat+"&lon="+lon, CurrentWeatherRecord.class);
 	}
 }

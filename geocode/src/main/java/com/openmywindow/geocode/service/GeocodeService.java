@@ -16,8 +16,8 @@ public class GeocodeService {
 	private final RestTemplate restTemplate;
 	private final GeocodeRepository geocodeRepository;
 
-	@Value("${openweatherapikey}")
-	private String OPEN_WEATHER_API_KEY = "keep-it-secret-keep-it-safe";
+	@Value("${SECRET_OPENWEATHER_API_KEY:defaultValue}")
+	private String OPEN_WEATHER_API_KEY;
 
 	public GeocodeService(RestTemplate restTemplate, GeocodeRepository geocodeRepository) {
 		this.restTemplate = restTemplate;

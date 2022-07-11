@@ -2,6 +2,21 @@
 
 The arbiter module is the decision maker.  It will take input from various sources and have the logic to determine if a window should be open or closed.
 
+= Environment Variables to Run Locally
+
+The application requires 2 environment variables to be set in order to execute
+----
+currentweatherserviceurl
+----
+
+and
+
+----
+geocodeserviceurl
+----
+
+To run locally these variables can be set in the environment variable via an export or they can be set via a command line parameter.  If they are not specified the default value will be the name of the service configured for kubernetes.
+
 = Docker
 
 The project can built with Docker with the command
