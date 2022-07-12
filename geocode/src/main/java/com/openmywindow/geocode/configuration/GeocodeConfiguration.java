@@ -16,8 +16,4 @@ public class GeocodeConfiguration {
 		return builder.build();
 	}
 
-	@Bean
-	public GeocodeService geocodeService(RestTemplate restTemplate, GeocodeRepository geocodeRepository) {
-		return new GeocodeService(restTemplate, geocodeRepository);
-	}
 }
