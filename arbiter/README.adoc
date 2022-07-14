@@ -6,7 +6,7 @@ The arbiter module is the decision maker.  It will take input from various sourc
 
 The application requires 2 environment variables to be set in order to execute
 ----
-currentweatherserviceurl
+forecastserviceurl
 ----
 
 and

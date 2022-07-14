@@ -1,10 +1,10 @@
 package com.openmywindow.arbiter.controller;
 
 import com.openmywindow.arbiter.ArbiterEngine;
-import com.openmywindow.arbiter.record.CurrentWeatherRecord;
+import com.openmywindow.arbiter.record.ForecastRecord;
 import com.openmywindow.arbiter.record.GeocodeCoordinates;
 import com.openmywindow.arbiter.record.WindowRecord;
-import com.openmywindow.arbiter.service.CurrentWeatherService;
+import com.openmywindow.arbiter.service.ForecastService;
 import com.openmywindow.arbiter.service.GeocodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +21,11 @@ public class ArbiterController {
 	private static final Logger log = LoggerFactory.getLogger(ArbiterController.class);
 	private final ArbiterEngine engine = new ArbiterEngine();
 	private final GeocodeService geocodeService;
-	private final CurrentWeatherService currentWeatherService;
+	private final ForecastService forecastService;
 
-	public ArbiterController(GeocodeService geocodeService, CurrentWeatherService currentWeatherService) {
+	public ArbiterController(GeocodeService geocodeService, ForecastService forecastService) {
 		this.geocodeService = geocodeService;
-		this.currentWeatherService = currentWeatherService;
+		this.forecastService = forecastService;
 	}
 
 	@GetMapping("test")
@@ -43,7 +43,7 @@ public class ArbiterController {
 	public WindowRecord makeCall(@RequestParam String postalCode) {
 		GeocodeCoordinates coordinates = geocodeService.getGeocodeCoordinates(postalCode);
 		log.info("coordinates - lat=" + coordinates.lat() + "; lon=" + coordinates.lon());
-		CurrentWeatherRecord currentWeather = currentWeatherService.getCurrentWeather(coordinates.lat(), coordinates.lon());
-		return engine.determineWindowStatus(new CurrentWeatherRecord(currentWeather.temp(), currentWeather.minTemp(), currentWeather.maxTemp()));
+		ForecastRecord forecast = forecastService.getCurrentWeather(coordinates.lat(), coordinates.lon());
+		return engine.determineWindowStatus(new ForecastRecord(forecast.temp(), forecast.minTemp(), forecast.maxTemp()));
 	}
 }

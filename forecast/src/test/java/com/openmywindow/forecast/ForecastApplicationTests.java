@@ -1,11 +1,11 @@
-package com.openmywindow.currentweather;
+package com.openmywindow.forecast;
 
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CurrentWeatherApplicationTests {
+class ForecastApplicationTests {
 
 	@Test
 	void contextLoads() {

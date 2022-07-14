@@ -1,13 +1,13 @@
-package com.openmywindow.currentweather;
+package com.openmywindow.forecast;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CurrentWeatherApplication {
+public class ForecastApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CurrentWeatherApplication.class, args);
+		SpringApplication.run(ForecastApplication.class, args);
 	}
 
 }

@@ -1,4 +1,4 @@
-package com.openmywindow.currentweather.helper;
+package com.openmywindow.forecast.helper;
 
 public class Conversion {
 

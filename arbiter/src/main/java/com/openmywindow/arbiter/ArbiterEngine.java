@@ -1,6 +1,6 @@
 package com.openmywindow.arbiter;
 
-import com.openmywindow.arbiter.record.CurrentWeatherRecord;
+import com.openmywindow.arbiter.record.ForecastRecord;
 import com.openmywindow.arbiter.record.WindowRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +9,7 @@ public class ArbiterEngine {
 
 	private static final Logger log = LoggerFactory.getLogger(ArbiterEngine.class);
 
-	public WindowRecord determineWindowStatus(CurrentWeatherRecord dailyWeather) {
+	public WindowRecord determineWindowStatus(ForecastRecord dailyWeather) {
 
 		String windowStatus = "";
 

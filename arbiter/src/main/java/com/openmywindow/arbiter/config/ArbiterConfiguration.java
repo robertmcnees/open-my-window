@@ -1,6 +1,6 @@
 package com.openmywindow.arbiter.config;
 
-import com.openmywindow.arbiter.service.CurrentWeatherService;
+import com.openmywindow.arbiter.service.ForecastService;
 import com.openmywindow.arbiter.service.GeocodeService;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -23,5 +23,5 @@ public class ArbiterConfiguration {
 	}
 
 	@Bean
-	public CurrentWeatherService getCurrentWeatherService(RestTemplate restTemplate) { return new CurrentWeatherService(restTemplate); }
+	public ForecastService getCurrentWeatherService(RestTemplate restTemplate) { return new ForecastService(restTemplate); }
 }

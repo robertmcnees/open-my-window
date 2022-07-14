@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.openmywindow</groupId>
-	<artifactId>current-weather</artifactId>
+	<artifactId>forecast</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>current-weather</name>
-	<description>current-weather</description>
+	<name>forecast</name>
+	<description>Get forecast data</description>
 	<properties>
 		<java.version>17</java.version>
 		<docker.image.prefix>rjmsandbox.azurecr.io</docker.image.prefix>

@@ -1,6 +1,6 @@
-package com.openmywindow.currentweather.configuration;
+package com.openmywindow.forecast.configuration;
 
-import com.openmywindow.currentweather.service.CurrentWeatherService;
+import com.openmywindow.forecast.service.ForecastService;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-public class CurrentWeatherConfiguration {
+public class ForecastConfiguration {
 
 	@Bean
 	public RestTemplate restTemplate(RestTemplateBuilder builder) {
@@ -16,7 +16,7 @@ public class CurrentWeatherConfiguration {
 	}
 
 	@Bean
-	public CurrentWeatherService currentWeatherService(RestTemplate restTemplate) {
-		return new CurrentWeatherService(restTemplate);
+	public ForecastService currentWeatherService(RestTemplate restTemplate) {
+		return new ForecastService(restTemplate);
 	}
 }
