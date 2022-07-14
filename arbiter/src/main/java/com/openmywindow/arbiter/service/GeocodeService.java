@@ -5,8 +5,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+@Component
 public class GeocodeService {
 
 	private final RestTemplate restTemplate;
@@ -15,8 +18,8 @@ public class GeocodeService {
 	@Value("${geocodeserviceurl:omw-geocode}")
 	private String geocodeServiceUrl;
 
-	public GeocodeService(RestTemplate restTemplate) {
-		this.restTemplate = restTemplate;
+	public GeocodeService(RestTemplateBuilder restTemplateBuilder) {
+		this.restTemplate = restTemplateBuilder.build();
 	}
 
 	public GeocodeCoordinates getGeocodeCoordinates(String postalCode) {
