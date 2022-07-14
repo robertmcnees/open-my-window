@@ -1,9 +1,8 @@
 package com.openmywindow.geocode.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
 
-@Entity
+import org.springframework.data.annotation.Id;
+
 public class GeocodeEntity {
 
 	@Id

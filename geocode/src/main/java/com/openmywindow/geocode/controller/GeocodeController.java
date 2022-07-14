@@ -2,6 +2,7 @@ package com.openmywindow.geocode.controller;
 
 import com.openmywindow.geocode.record.GeocodeResponse;
 import com.openmywindow.geocode.service.GeocodeService;
+import reactor.core.publisher.Mono;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +20,7 @@ public class GeocodeController {
 	}
 
 	@GetMapping("coordinates")
-	public GeocodeResponse getCoordinates(@RequestParam String postalCode) {
+	public Mono<GeocodeResponse> getCoordinates(@RequestParam String postalCode) {
 		return geocodeService.geocodePostalCode(postalCode);
 	}
 }

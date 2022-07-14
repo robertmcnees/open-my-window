@@ -1,0 +1,1 @@
+CREATE TABLE GEOCODE_ENTITY (postal_code varchar(255) PRIMARY KEY, lat DOUBLE, lon DOUBLE);

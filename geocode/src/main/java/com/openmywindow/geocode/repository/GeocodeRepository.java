@@ -1,11 +1,12 @@
 package com.openmywindow.geocode.repository;
 
 import com.openmywindow.geocode.entity.GeocodeEntity;
+import reactor.core.publisher.Mono;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 
-public interface GeocodeRepository extends CrudRepository<GeocodeEntity, String> {
+public interface GeocodeRepository extends ReactiveCrudRepository<GeocodeEntity, String> {
 
-	GeocodeEntity findByPostalCode(String postalCode);
+	Mono<GeocodeEntity> findByPostalCode(String postalCode);
 
 }

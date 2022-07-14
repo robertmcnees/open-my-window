@@ -6,46 +6,53 @@ import com.openmywindow.geocode.record.OpenWeatherGeocodeResponse;
 import com.openmywindow.geocode.repository.GeocodeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Mono;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Component
 public class GeocodeService {
 
-	private static final Logger log = LoggerFactory.getLogger(GeocodeService.class);
-	private final RestTemplate restTemplate;
+	private final WebClient webClient;
 	private final GeocodeRepository geocodeRepository;
+	private final Logger log = LoggerFactory.getLogger(GeocodeService.class);
 
 	@Value("${SECRET_OPENWEATHER_API_KEY:defaultValue}")
 	private String OPEN_WEATHER_API_KEY;
 
-	public GeocodeService(RestTemplate restTemplate, GeocodeRepository geocodeRepository) {
-		this.restTemplate = restTemplate;
+	public GeocodeService(WebClient.Builder builder, GeocodeRepository geocodeRepository) {
+		this.webClient = builder.baseUrl("http://api.openweathermap.org/geo/1.0").build();
 		this.geocodeRepository = geocodeRepository;
 	}
 
-	public GeocodeResponse geocodePostalCode(String postalCode) {
-		log.info("Open weather API key = " + OPEN_WEATHER_API_KEY);
-		GeocodeEntity cached = findCachedValue(postalCode);
-		if (cached == null) {
-			log.info("no cache for " + postalCode + ", calling open weather api");
-			OpenWeatherGeocodeResponse response =
-					restTemplate.getForObject(
-							"http://api.openweathermap.org/geo/1.0/zip?zip=" + postalCode + ",US&appid=" + OPEN_WEATHER_API_KEY,
-							OpenWeatherGeocodeResponse.class);
-			log.info("Postal Code " + postalCode + " coordinates of lat: " + response.lat() + " & lon: " + response.lon());
-			geocodeRepository.save(new GeocodeEntity(response.zip(), response.lat(), response.lon()));
-			return new GeocodeResponse(response.lat(), response.lon());
-		}
-		else {
-			log.info("returning " + postalCode + " from cache:  lat=" + cached.getLat() + " lon=" + cached.getLon());
-			return new GeocodeResponse(cached.getLat(), cached.getLon());
-		}
+	public Mono<GeocodeResponse> geocodePostalCode(String postalCode) {
+		return reactiveFindCachedValue(postalCode)
+				.switchIfEmpty(Mono.defer(() -> this.reactiveWebCall(postalCode)));
 	}
 
-	private GeocodeEntity findCachedValue(String postalCode) {
-		return geocodeRepository.findByPostalCode(postalCode);
+	private Mono<GeocodeResponse> reactiveWebCall(String postalCode) {
+		return webClient
+				.get()
+				.uri("/zip?zip=" + postalCode + ",US&appid=" + OPEN_WEATHER_API_KEY)
+				.accept(MediaType.APPLICATION_JSON)
+				.retrieve()
+				.bodyToMono(OpenWeatherGeocodeResponse.class)
+				.map(r -> new GeocodeResponse(r.lat(), r.lon()))
+				.map(r -> reactiveSave(postalCode, r));
 	}
+
+	private GeocodeResponse reactiveSave(String postalCode, GeocodeResponse response) {
+		//TODO: is there a way that this method can return null?
+		geocodeRepository.save(new GeocodeEntity(postalCode, response.lat(), response.lon()));
+		return response;
+	}
+
+	private Mono<GeocodeResponse> reactiveFindCachedValue(String postalCode) {
+		Mono<GeocodeEntity> databaseEntity = geocodeRepository.findByPostalCode(postalCode);
+		return (databaseEntity == null) ? Mono.empty() : databaseEntity.map(r -> new GeocodeResponse(r.getLat(), r.getLon()));
+	}
+
 }
