@@ -1,4 +1,7 @@
 package com.openmywindow.forecast.record;
 
-public record ForecastResponse(Double temp, Double minTemp, Double maxTemp){
+import java.util.List;
+
+public record ForecastResponse(Double temp, Double minTemp, Double maxTemp, List<HourlyForecast> hourlyForecastList){
 }
+

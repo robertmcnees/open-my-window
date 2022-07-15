@@ -1,10 +1,13 @@
 package com.openmywindow.forecast.service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-import com.openmywindow.forecast.helper.Conversion;
 import com.openmywindow.forecast.record.ForecastResponse;
+import com.openmywindow.forecast.record.HourlyForecast;
 import com.openmywindow.forecast.record.openweather.OneCallResponse;
+import com.openmywindow.forecast.record.openweather.hourly.OpenWeatherHourly;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,13 +32,14 @@ public class ForecastService {
 				restTemplate.getForObject(
 						"https://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon=" + lon
 								//+ "&exclude=minutely,daily,alerts" //include hourly, current
-								+ "&exclude=minutely,alerts,hourly" //include current, daily
+								//+ "&exclude=minutely,alerts,hourly" //include current, daily
+								+ "&exclude=minutely,alerts" //include current, daily, hourly
 								+ "&appid=" + OPEN_WEATHER_API_KEY,
 						OneCallResponse.class);
 
 
-		Double highTemp = Conversion.convertKelvinToFahrenheit(response.current().temp());
-		Double lowTemp = Conversion.convertKelvinToFahrenheit(response.current().temp());
+		Double highTemp = response.current().temp();
+		Double lowTemp = response.current().temp();
 
 		if (response.daily() != null && response.daily().size() > 0) {
 			/// Assuming current date is at index 0.
@@ -44,10 +48,17 @@ public class ForecastService {
 			highTemp = response.daily().get(0).temp().max();
 		}
 
+		List<HourlyForecast> hourlyForecastList = new ArrayList<>();
+		if (response.hourly() != null && response.hourly().size() > 0) {
+			List<OpenWeatherHourly> openWeatherHourlyList = response.hourly();
+			for (OpenWeatherHourly openWeatherHourly : openWeatherHourlyList) {
+				hourlyForecastList.add(new HourlyForecast(openWeatherHourly.dt(), openWeatherHourly.temp()));
+			}
+		}
+
+
 		return new ForecastResponse(
-				Conversion.convertKelvinToFahrenheit(response.current().temp()),
-				Conversion.convertKelvinToFahrenheit(lowTemp),
-				Conversion.convertKelvinToFahrenheit(highTemp));
+				response.current().temp(), lowTemp, highTemp, hourlyForecastList);
 
 	}
 

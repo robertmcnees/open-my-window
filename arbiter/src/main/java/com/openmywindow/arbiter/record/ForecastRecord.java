@@ -1,3 +1,5 @@
 package com.openmywindow.arbiter.record;
 
-public record ForecastRecord(Integer temp, Integer minTemp, Integer maxTemp) { }
+import java.util.List;
+
+public record ForecastRecord(Double temp, Double minTemp, Double maxTemp, List<HourlyForecastRecord> hourlyForecastList) { }

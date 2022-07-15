@@ -20,6 +20,6 @@ public class ForecastService {
 	}
 
 	public ForecastRecord getCurrentWeather(Double lat, Double lon) {
-		return restTemplate.getForObject("http://" + currentWeatherServiceUrl + "/current/currentWeather?lat="+lat+"&lon="+lon, ForecastRecord.class);
+		return restTemplate.getForObject("http://" + currentWeatherServiceUrl + "/forecast/forecastWeather?lat="+lat+"&lon="+lon, ForecastRecord.class);
 	}
 }

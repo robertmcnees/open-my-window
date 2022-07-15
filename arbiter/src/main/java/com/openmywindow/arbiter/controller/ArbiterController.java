@@ -44,6 +44,6 @@ public class ArbiterController {
 		GeocodeCoordinates coordinates = geocodeService.getGeocodeCoordinates(postalCode);
 		log.info("coordinates - lat=" + coordinates.lat() + "; lon=" + coordinates.lon());
 		ForecastRecord forecast = forecastService.getCurrentWeather(coordinates.lat(), coordinates.lon());
-		return engine.determineWindowStatus(new ForecastRecord(forecast.temp(), forecast.minTemp(), forecast.maxTemp()));
+		return engine.determineMessage(forecast);
 	}
 }

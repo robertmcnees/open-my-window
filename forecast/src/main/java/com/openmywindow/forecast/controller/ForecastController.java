@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/current")
+@RequestMapping("/forecast")
 public class ForecastController {
 
 	private static final Logger log = LoggerFactory.getLogger(ForecastController.class);
@@ -22,7 +22,7 @@ public class ForecastController {
 		this.forecastService = forecastService;
 	}
 
-	@GetMapping("currentWeather")
+	@GetMapping("forecastWeather")
 	public ForecastResponse getCurrentWeather(@RequestParam(name = "lat") Double lat, @RequestParam(name = "lon") Double lon) {
 		return forecastService.getOpenWeatherApiCurrentWeather(lat, lon);
 	}
