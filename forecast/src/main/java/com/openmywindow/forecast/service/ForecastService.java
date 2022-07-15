@@ -1,8 +1,10 @@
 package com.openmywindow.forecast.service;
 
+import java.util.Date;
+
 import com.openmywindow.forecast.helper.Conversion;
 import com.openmywindow.forecast.record.ForecastResponse;
-import com.openmywindow.forecast.record.OpenWeatherApiOneCallWeatherResponse;
+import com.openmywindow.forecast.record.openweather.OneCallResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,15 +25,29 @@ public class ForecastService {
 
 	public ForecastResponse getOpenWeatherApiCurrentWeather(Double lat, Double lon) {
 
-		OpenWeatherApiOneCallWeatherResponse response =
+		OneCallResponse response =
 				restTemplate.getForObject(
-						"https://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&appid=" + OPEN_WEATHER_API_KEY,
-						OpenWeatherApiOneCallWeatherResponse.class);
+						"https://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon=" + lon
+								//+ "&exclude=minutely,daily,alerts" //include hourly, current
+								+ "&exclude=minutely,alerts,hourly" //include current, daily
+								+ "&appid=" + OPEN_WEATHER_API_KEY,
+						OneCallResponse.class);
+
+
+		Double highTemp = Conversion.convertKelvinToFahrenheit(response.current().temp());
+		Double lowTemp = Conversion.convertKelvinToFahrenheit(response.current().temp());
+
+		if (response.daily() != null && response.daily().size() > 0) {
+			/// Assuming current date is at index 0.
+			Date dailyForecastDate = new Date(response.daily().get(0).dt() * 1000L);
+			lowTemp = response.daily().get(0).temp().min();
+			highTemp = response.daily().get(0).temp().max();
+		}
 
 		return new ForecastResponse(
-				Conversion.convertKelvinToFahrenheit(response.main().temp()),
-				Conversion.convertKelvinToFahrenheit(response.main().temp_min()),
-				Conversion.convertKelvinToFahrenheit(response.main().temp_max()));
+				Conversion.convertKelvinToFahrenheit(response.current().temp()),
+				Conversion.convertKelvinToFahrenheit(lowTemp),
+				Conversion.convertKelvinToFahrenheit(highTemp));
 
 	}
 
