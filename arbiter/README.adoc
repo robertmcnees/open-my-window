@@ -32,12 +32,3 @@ And the project can be run locally with the command
 ----
 docker container run --name arbiter -p 8080:8080 openmywindow/arbiter
 ----
-
-= Azure
-
-The project is configured to push the docker image to an Azure container registry.
-
-[source, console]
-----
-az acr login && mvn compile jib:build
-----
