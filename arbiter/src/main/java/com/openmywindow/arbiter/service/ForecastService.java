@@ -12,7 +12,7 @@ public class ForecastService {
 
 	private final RestTemplate restTemplate;
 
-	@Value("${forecastserviceurl:omw-currentweather}")
+	@Value("${forecastserviceurl:omw-forecast}")
 	private String currentWeatherServiceUrl;
 
 	public ForecastService(RestTemplateBuilder restTemplateBuilder) {

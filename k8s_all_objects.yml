@@ -67,19 +67,19 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: omw-current-weather
+  name: omw-forecast
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: omw-current-weather
+      app: omw-forecast
   template:
     metadata:
       labels:
-        app: omw-current-weather
+        app: omw-forecast
     spec:
       containers:
-        - name: current-weather
+        - name: forecast
           env:
             - name: SECRET_OPENWEATHER_API_KEY
               valueFrom:
@@ -87,15 +87,15 @@ spec:
                   name: omw-openweather-apikey
                   key: openweatherapikey
                   optional: false
-          image: rjmsandbox.azurecr.io/current-weather:latest
+          image: rjmsandbox.azurecr.io/forecast:latest
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: omw-currentweather
+  name: omw-forecast
 spec:
   ports:
     - port: 80
       targetPort: 8082
   selector:
-    app: omw-current-weather
+    app: omw-forecast
