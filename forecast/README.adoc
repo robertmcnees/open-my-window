@@ -1,0 +1,3 @@
+= Overview
+
+The ``forecast`` service returns weather information for a given coordinates.  The data returned from the OpenWeather API should be relevant to the `arbiter` module to determine if a window should be open or closed.
