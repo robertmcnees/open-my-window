@@ -72,9 +72,7 @@ Where the property ``${docker.image.prefix}`` was the repository that I created.
 
 ### Secret Management
 
-I used [Azure's Key Vault](https://azure.microsoft.com/en-us/services/key-vault/) to store the OpenWeather API key.  Key Vault was able to be used in AKS without issue.
-
-While there are many ways to load a secret to Key Vault, I used the command line from AKS and executed the command:
+I used native secrets in kubernetes.  I used the command line from CloudShell in AKS and executed the command:
 
 ```kubectl create secret generic omw-openweather-apikey --from-literal=openweatherapikey=<your_api_key>```
 

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: geocode
-          image: rjmsandbox.azurecr.io/arbiter:latest
+          image: rjmregistry.azurecr.io/arbiter:latest
 ---
 apiVersion: v1
 kind: Service
@@ -51,7 +51,7 @@ spec:
                   name: omw-openweather-apikey
                   key: openweatherapikey
                   optional: false
-          image: rjmsandbox.azurecr.io/geocode:latest
+          image: rjmregistry.azurecr.io/geocode:latest
 ---
 apiVersion: v1
 kind: Service
@@ -87,7 +87,7 @@ spec:
                   name: omw-openweather-apikey
                   key: openweatherapikey
                   optional: false
-          image: rjmsandbox.azurecr.io/forecast:latest
+          image: rjmregistry.azurecr.io/forecast:latest
 ---
 apiVersion: v1
 kind: Service
