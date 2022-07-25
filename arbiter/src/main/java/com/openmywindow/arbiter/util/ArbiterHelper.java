@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class ArbiterHelper {
 
-	private static final SimpleDateFormat dateOnlySimpleDateFormat = new SimpleDateFormat("yyyyMMdd hha");
+	private static final SimpleDateFormat dateOnlySimpleDateFormat = new SimpleDateFormat("yyyyMMdd hh a");
 
 
 

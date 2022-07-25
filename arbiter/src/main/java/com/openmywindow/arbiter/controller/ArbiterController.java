@@ -1,9 +1,9 @@
 package com.openmywindow.arbiter.controller;
 
 import com.openmywindow.arbiter.ArbiterEngine;
+import com.openmywindow.arbiter.domain.WindowRecommendation;
 import com.openmywindow.arbiter.record.ForecastRecord;
 import com.openmywindow.arbiter.record.GeocodeCoordinates;
-import com.openmywindow.arbiter.record.WindowRecord;
 import com.openmywindow.arbiter.service.ForecastService;
 import com.openmywindow.arbiter.service.GeocodeService;
 import org.slf4j.Logger;
@@ -28,11 +28,6 @@ public class ArbiterController {
 		this.forecastService = forecastService;
 	}
 
-	@GetMapping("test")
-	public String getTest() {
-		return "hello window";
-	}
-
 	@GetMapping("coordinates")
 	public String getCoordinates(@RequestParam String postalCode) {
 		GeocodeCoordinates coordinates = geocodeService.getGeocodeCoordinates(postalCode);
@@ -40,10 +35,10 @@ public class ArbiterController {
 	}
 
 	@GetMapping("window")
-	public WindowRecord makeCall(@RequestParam String postalCode) {
+	public WindowRecommendation calculateWindowRecommendation(@RequestParam String postalCode) {
 		GeocodeCoordinates coordinates = geocodeService.getGeocodeCoordinates(postalCode);
-		log.info("coordinates - lat=" + coordinates.lat() + "; lon=" + coordinates.lon());
+		log.info("Geocode returned coordinates - lat=" + coordinates.lat() + "; lon=" + coordinates.lon());
 		ForecastRecord forecast = forecastService.getCurrentWeather(coordinates.lat(), coordinates.lon());
-		return engine.determineMessage(forecast);
+		return engine.determineComplexMessage(forecast);
 	}
 }
