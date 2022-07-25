@@ -51,7 +51,7 @@ spec:
 ### Container Registry
 
 I followed [this walkthrough from Microsoft](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-java-quickstart) which I will quickly summarize my key points.  I first created an [Azure Container Registry](https://azure.microsoft.com/en-us/services/container-registry/) for uploaded images.  To push the image to the registry, I used the command:
-``az acr login && mvn clean compile -Pazure jib:build``
+``az acr login --name <your_repo> && mvn clean compile jib:build``
 In order to use that command I had to make some changes to my ``pom.xml``.  This plugin was added:
 ```xml
 <plugin>
