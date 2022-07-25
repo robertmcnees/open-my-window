@@ -1,4 +1,4 @@
 package com.openmywindow.arbiter.record;
 
-public record HourlyForecastRecord (Long dateTime, Double temp){
+public record HourlyForecastRecord (Long dateTime, Double temp, Double humidity){
 }

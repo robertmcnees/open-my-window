@@ -4,8 +4,10 @@ public class WindowRecommendation {
 
 	private String status;
 	private String tempRecommendation;
+	private String humidityRecommendation;
 	private String nextRecommendation;
 	private Double currentTemp;
+	private Double currentHumidity;
 	private Double dailyHighTemp;
 	private Double dailyLowTemp;
 
@@ -55,5 +57,21 @@ public class WindowRecommendation {
 
 	public void setDailyLowTemp(Double dailyLowTemp) {
 		this.dailyLowTemp = dailyLowTemp;
+	}
+
+	public String getHumidityRecommendation() {
+		return humidityRecommendation;
+	}
+
+	public void setHumidityRecommendation(String humidityRecommendation) {
+		this.humidityRecommendation = humidityRecommendation;
+	}
+
+	public Double getCurrentHumidity() {
+		return currentHumidity;
+	}
+
+	public void setCurrentHumidity(Double currentHumidity) {
+		this.currentHumidity = currentHumidity;
 	}
 }

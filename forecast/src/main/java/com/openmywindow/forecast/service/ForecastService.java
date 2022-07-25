@@ -52,13 +52,13 @@ public class ForecastService {
 		if (response.hourly() != null && response.hourly().size() > 0) {
 			List<OpenWeatherHourly> openWeatherHourlyList = response.hourly();
 			for (OpenWeatherHourly openWeatherHourly : openWeatherHourlyList) {
-				hourlyForecastList.add(new HourlyForecast(openWeatherHourly.dt(), openWeatherHourly.temp()));
+				hourlyForecastList.add(new HourlyForecast(openWeatherHourly.dt(), openWeatherHourly.temp(), openWeatherHourly.humidity()));
 			}
 		}
 
 
 		return new ForecastResponse(
-				response.current().temp(), lowTemp, highTemp, hourlyForecastList);
+				response.current().temp(), lowTemp, highTemp, response.current().humidity(), hourlyForecastList);
 
 	}
 
