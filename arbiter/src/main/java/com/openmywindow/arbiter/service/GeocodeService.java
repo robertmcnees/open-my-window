@@ -14,6 +14,7 @@ public class GeocodeService {
 
 	private static final Logger log = LoggerFactory.getLogger(RestTemplate.class);
 	private final RestTemplate restTemplate;
+
 	@Value("${geocodeserviceurl:geocode}")
 	private String geocodeServiceUrl;
 
