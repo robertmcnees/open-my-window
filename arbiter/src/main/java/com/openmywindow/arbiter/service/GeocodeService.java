@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -14,16 +16,17 @@ public class GeocodeService {
 
 	private final RestTemplate restTemplate;
 	private static final Logger log = LoggerFactory.getLogger(RestTemplate.class);
+	private final DiscoveryClient discoveryClient;
 
-	@Value("${geocodeserviceurl:omw-geocode}")
-	private String geocodeServiceUrl;
-
-	public GeocodeService(RestTemplateBuilder restTemplateBuilder) {
+	public GeocodeService(RestTemplateBuilder restTemplateBuilder, DiscoveryClient discoveryClient) {
 		this.restTemplate = restTemplateBuilder.build();
+		this.discoveryClient = discoveryClient;
 	}
 
 	public GeocodeCoordinates getGeocodeCoordinates(String postalCode) {
-		log.info("Geocode URL" + geocodeServiceUrl);
-		return restTemplate.getForObject("http://" + geocodeServiceUrl + "/geocode/coordinates?postalCode=" + postalCode, GeocodeCoordinates.class);
+		ServiceInstance serviceInstance = discoveryClient.getInstances("geocode").get(0);
+		log.info("Geocode URL" + serviceInstance.getUri().toString());
+		return restTemplate.getForObject("http://" + serviceInstance.getUri().getHost() + ":" + serviceInstance.getUri().getPort()
+				+ "/geocode/coordinates?postalCode=" + postalCode, GeocodeCoordinates.class);
 	}
 }

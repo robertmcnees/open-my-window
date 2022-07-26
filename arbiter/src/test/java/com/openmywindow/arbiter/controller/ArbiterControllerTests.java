@@ -18,10 +18,10 @@ public class ArbiterControllerTests {
 	@Autowired
 	private TestRestTemplate restTemplate;
 
-	@Test
-	public void testMethodShouldReturnValue() {
-		String response = this.restTemplate.getForObject("http://localhost:" + port + "/arbiter/test", String.class);
-		assertEquals(response, "hello window");
-	}
+//	@Test
+//	public void testMethodShouldReturnValue() {
+//		String response = this.restTemplate.getForObject("http://localhost:" + port + "/arbiter/test", String.class);
+//		assertEquals(response, "hello window");
+//	}
 
 }

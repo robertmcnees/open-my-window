@@ -28,6 +28,11 @@ public class ArbiterController {
 		this.forecastService = forecastService;
 	}
 
+	@GetMapping("test")
+	public String simpleTest() {
+		return "rjm - return from simple test";
+	}
+
 	@GetMapping("coordinates")
 	public String getCoordinates(@RequestParam String postalCode) {
 		GeocodeCoordinates coordinates = geocodeService.getGeocodeCoordinates(postalCode);
