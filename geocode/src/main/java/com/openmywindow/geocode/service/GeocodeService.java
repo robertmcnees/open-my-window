@@ -28,15 +28,15 @@ public class GeocodeService {
 		this.geocodeRepository = geocodeRepository;
 	}
 
-	public Mono<GeocodeResponse> geocodePostalCode(String postalCode) {
+	public Mono<GeocodeResponse> geocodePostalCode(String postalCode, String countryCode) {
 		return reactiveFindCachedValue(postalCode)
-				.switchIfEmpty(Mono.defer(() -> this.reactiveWebCall(postalCode)));
+				.switchIfEmpty(Mono.defer(() -> this.reactiveWebCall(postalCode, countryCode)));
 	}
 
-	private Mono<GeocodeResponse> reactiveWebCall(String postalCode) {
+	private Mono<GeocodeResponse> reactiveWebCall(String postalCode, String countryCode) {
 		return webClient
 				.get()
-				.uri("/zip?zip=" + postalCode + ",US&appid=" + OPEN_WEATHER_API_KEY)
+				.uri("/zip?zip=" + postalCode + "," + countryCode + "&appid=" + OPEN_WEATHER_API_KEY)
 				.accept(MediaType.APPLICATION_JSON)
 				.retrieve()
 				.bodyToMono(OpenWeatherGeocodeResponse.class)
@@ -45,7 +45,6 @@ public class GeocodeService {
 	}
 
 	private GeocodeResponse reactiveSave(String postalCode, GeocodeResponse response) {
-		//TODO: is there a way that this method can return null?
 		geocodeRepository.save(new GeocodeEntity(postalCode, response.lat(), response.lon()));
 		return response;
 	}

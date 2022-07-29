@@ -20,7 +20,7 @@ public class GeocodeController {
 	}
 
 	@GetMapping("coordinates")
-	public Mono<GeocodeResponse> getCoordinates(@RequestParam String postalCode) {
-		return geocodeService.geocodePostalCode(postalCode);
+	public Mono<GeocodeResponse> getCoordinates(@RequestParam String postalCode, @RequestParam String countryCode) {
+		return geocodeService.geocodePostalCode(postalCode, countryCode);
 	}
 }

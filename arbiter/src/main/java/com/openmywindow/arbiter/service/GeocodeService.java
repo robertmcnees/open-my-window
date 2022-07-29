@@ -22,8 +22,9 @@ public class GeocodeService {
 		this.restTemplate = restTemplateBuilder.build();
 	}
 
-	public GeocodeCoordinates getGeocodeCoordinates(String postalCode) {
+	public GeocodeCoordinates getGeocodeCoordinates(String postalCode, String countryCode) {
 		log.info("Geocode URL" + geocodeServiceUrl);
-		return restTemplate.getForObject("http://" + geocodeServiceUrl + "/geocode/coordinates?postalCode=" + postalCode, GeocodeCoordinates.class);
+		return restTemplate.getForObject("http://" + geocodeServiceUrl + "/geocode/coordinates?postalCode=" + postalCode + "&countryCode=" + countryCode,
+				GeocodeCoordinates.class);
 	}
 }
