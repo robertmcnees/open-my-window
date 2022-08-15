@@ -30,6 +30,11 @@ public class ArbiterController {
 		this.forecastService = forecastService;
 	}
 
+	@GetMapping("test")
+	public String controlTest() {
+		return "hello window";
+	}
+
 	@GetMapping("coordinates")
 	public String getCoordinates(@RequestParam String postalCode) {
 		GeocodeCoordinates coordinates = geocodeService.getGeocodeCoordinates(postalCode, "US");
@@ -40,7 +45,7 @@ public class ArbiterController {
 	public WindowRecommendation calculateWindowRecommendation(@RequestParam String postalCode,
 			@RequestParam(defaultValue = "US", required = false) String countryCode,
 			@RequestParam(defaultValue = "297.039", required = false) Double comfortableTemperature,
-			@RequestParam(defaultValue = "80", required = false) Double comfortableHumidity,
+			@RequestParam(defaultValue = "100", required = false) Double comfortableHumidity,
 			@RequestParam(defaultValue = "F", required = false) TemperatureScale units) {
 
 		// if the user specified a temperature and a preferred unit then likely they specified the temp in the same unit
