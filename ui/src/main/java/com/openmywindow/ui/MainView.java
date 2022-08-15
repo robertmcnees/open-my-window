@@ -20,12 +20,16 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @PageTitle("Open My Window")
 @Route
 public class MainView extends VerticalLayout {
+
+	@Value("${arbiterserviceurl:omw-arbiter}")
+	private String arbiterServiceUrl;
 
 	TextField postalCodeTextField = new TextField();
 	TextField comfortableHumidityTextField = new TextField();
@@ -82,13 +86,11 @@ public class MainView extends VerticalLayout {
 
 		Optional<String> comfortableHumidityOptional = (comfortableHumidityTextField == null || comfortableHumidityTextField.getValue().equals("")) ? Optional.empty() : Optional.of(comfortableHumidityTextField.getValue());
 
-
-
-		URI omwURI = UriComponentsBuilder.fromUriString("http://localhost:8080/arbiter/window")
+		URI omwURI = UriComponentsBuilder.fromUriString("http://"+arbiterServiceUrl+"/arbiter/window")
 				.queryParam("postalCode", postalCodeTextField.getValue())
 				.queryParamIfPresent("comfortableHumidity", comfortableHumidityOptional)
 				.build().toUri();
-		Notification.show("calling with " + omwURI.toString());
+
 		WebClient.RequestHeadersSpec<?> spec = WebClient.create().
 				get().uri(omwURI);
 		WindowRecord windowRecord = spec.retrieve().bodyToMono(WindowRecord.class).block();

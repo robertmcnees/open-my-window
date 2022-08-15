@@ -31,7 +31,6 @@ kind: Service
 metadata:
   name: omw-arbiter
 spec:
-  type: LoadBalancer
   ports:
     - port: 80
       targetPort: 8080
@@ -129,3 +128,36 @@ spec:
       targetPort: 8082
   selector:
     app: omw-forecast
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: omw-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: omw-ui
+  template:
+    metadata:
+      labels:
+        app: omw-ui
+    spec:
+      containers:
+        - name: geocode
+          image: rjmregistry.azurecr.io/ui:latest
+          env:
+            - name: vaadin.productionMode
+              value: "true"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: omw-ui
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 8085
+  selector:
+    app: omw-ui

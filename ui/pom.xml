@@ -16,6 +16,8 @@
 	<properties>
 		<java.version>17</java.version>
 		<vaadin.version>23.1.4</vaadin.version>
+		<docker.image.prefix>rjmregistry.azurecr.io</docker.image.prefix>
+		<jib-maven-plugin.version>3.2.1</jib-maven-plugin.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -51,6 +53,19 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<artifactId>jib-maven-plugin</artifactId>
+				<groupId>com.google.cloud.tools</groupId>
+				<version>${jib-maven-plugin.version}</version>
+				<configuration>
+					<from>
+						<image>mcr.microsoft.com/java/jdk:17-zulu-alpine</image>
+					</from>
+					<to>
+						<image>rjmregistry.azurecr.io/ui</image>
+					</to>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
