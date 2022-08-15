@@ -31,6 +31,9 @@ public class MainView extends VerticalLayout {
 	@Value("${arbiterserviceurl:omw-arbiter}")
 	private String arbiterServiceUrl;
 
+	@Value("${arbiterserviceport:#{null}}")
+	private String arbiterServicePort;
+
 	TextField postalCodeTextField = new TextField();
 	TextField comfortableHumidityTextField = new TextField();
 
@@ -85,11 +88,11 @@ public class MainView extends VerticalLayout {
 	public void handleButtonClick(ClickEvent<Button> buttonClickEvent) {
 
 		Optional<String> comfortableHumidityOptional = (comfortableHumidityTextField == null || comfortableHumidityTextField.getValue().equals("")) ? Optional.empty() : Optional.of(comfortableHumidityTextField.getValue());
-
-		URI omwURI = UriComponentsBuilder.fromUriString("http://"+arbiterServiceUrl+"/arbiter/window")
+		URI omwURI = UriComponentsBuilder.newInstance().scheme("http").host(arbiterServiceUrl).port(arbiterServicePort)
+				.path("/arbiter").path("/window")
 				.queryParam("postalCode", postalCodeTextField.getValue())
 				.queryParamIfPresent("comfortableHumidity", comfortableHumidityOptional)
-				.build().toUri();
+				.build(true).toUri();
 
 		WebClient.RequestHeadersSpec<?> spec = WebClient.create().
 				get().uri(omwURI);
