@@ -4,94 +4,53 @@ open-my-window seeks to provide the answer to a seemingly simple question.  "Sho
 
 The project is largely intended to be a personal sandbox for exploration with various tech.  Things may get a bit over-engineered at times in the spirit of learning new tech.  I will start with what I want to learn and then try to find a place for it inside this project.
 
-The entry point to the project is through the ``arbiter`` module, specifically through the endpoint ``/arbiter/window?postalCode=<postalCode>``.  ``arbiter`` will call ``geocode`` to get the coordinates for a given postal code (only US is supported at the moment).  Those coordinates are passed to ``forecast`` to obtain the weather data.  ``arbiter`` is responsible for parsing that data and making the final determination if your should open your window.  
+The entry point to the project is through the ``arbiter`` module, specifically through the endpoint ``/arbiter/window?postalCode=<postalCode>``.  ``arbiter`` will call ``geocode`` to get the coordinates for a given postal code.  Those coordinates are passed to ``forecast`` to obtain the weather data.  ``arbiter`` is responsible for parsing that data and making the final determination if your should open your window.  
 
 Outside calls are made to the [OpenWeather API](https://openweathermap.org/api).  You will need your own API key if you wish to run the project yourself.  I am using the [One Call API](https://openweathermap.org/api/one-call-3).  
 
-### Environment Variables
+# Azure Spring Apps
 
-The ``geocode`` and ``forecast`` modules use the OpenWeather API.  The API key is injected into a Spring bean using the parameter ``SECRET_OPENWEATHER_API_KEY``.  When running locally I pass the value as a JVM argument using ``-DSECRET_OPENWEATHER_API_KEY=<your_key>``.  When running in Kubernetes, the value is injected into a pod as a secret shown in the following snippet from ``k8s_all_objects.yml``:
-```yaml
-  env:
-    - name: SECRET_OPENWEATHER_API_KEY
-      valueFrom:
-        secretKeyRef:
-          name: omw-openweather-apikey
-          key: openweatherapikey
-          optional: false
-```
-This assumes that the secret has already been created in the k8s environment.  More on that in a minute.
+This branch exists to showcase how to build and applications specifically tailored for [Azure Spring Apps](https://azure.microsoft.com/en-us/services/spring-apps/).
 
-``arbiter`` currently finds services to communicate with by injecting the URL as a Spring ``@Value`` parameter.  When running locally I use JVM arguments to locate the services, specifically:
-```
--Dforecastserviceurl=localhost:8082 -Dgeocodeserviceurl=localhost:8081
-```
+### Service Discovery
 
-When running in Kubernetes, the URLs default to the services defined in ``ks_all_objects.yml``.  For example, 
+As stated by [Azure Documentation](https://docs.microsoft.com/en-us/azure/spring-cloud/how-to-service-registration?pivots=programming-language-java) regarding service registration and discovery, Azure Spring Apps provides 2 methods to allow your services to find each other.  For demonstration purposes, open-my-window uses both.  arbiter -> geocode will use the native service and arbiter -> forecast will use Spring Cloud service discovery.
+1. Kubernetes service names are created automatically
+
+``
+Azure Spring Apps creates a corresponding kubernetes service for every app running in it using app name as the kubernetes service name. So you can invoke calls in one app to another app by using app name in a http/https request like http(s)://{app name}/path.
+``
+
+The `GeocodeService` class in `arbiter` uses this approach.  Since it is using a native k8s service under the hood, it will look very similar to a native k8s solution.
+
+In the example below when running in Azure Spring Apps no variable `geocodeserviceurl` will be provided so the URL will default to `geocode` which is the same as the application name that we wish to call.
 ```java
-@Value("${forecastserviceurl:omw-forecast}")
-```
-Uses a default that matches
-```yml
-apiVersion: v1
-kind: Service
-metadata:
-  name: omw-forecast
-spec:
-  ports:
-    - port: 80
-      targetPort: 8082
-  selector:
-    app: omw-forecast
+	@Value("${geocodeserviceurl:geocode}")
+	private String geocodeServiceUrl;
 ```
 
+2. Use Spring Cloud Service Registration
 
-## Running with Azure (AKS)
+The `ForecastService` class in `arbiter` will use the instance of `forecast` registered with the service registration.  A `DiscoveryClient` is injected into the constructor of this class to find the instance.  The `ForecastApplication` is annotated with `@EnableEurekaClient` to register itself.
 
-### Container Registry
+## Running Locally
 
-I followed [this walkthrough from Microsoft](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-java-quickstart) which I will quickly summarize my key points.  I first created an [Azure Container Registry](https://azure.microsoft.com/en-us/services/container-registry/) for uploaded images.  To push the image to the registry, I used the command:
-``az acr login --name <your_repo> && mvn clean compile jib:build``
-In order to use that command I had to make some changes to my ``pom.xml``.  This plugin was added:
-```xml
-<plugin>
-    <artifactId>jib-maven-plugin</artifactId>
-    <groupId>com.google.cloud.tools</groupId>
-    <version>${jib-maven-plugin.version}</version>
-    <configuration>
-        <from>
-            <image>mcr.microsoft.com/java/jdk:17-zulu-alpine</image>
-        </from>
-        <to>
-            <image>${docker.image.prefix}/${project.artifactId}</image>
-        </to>
-    </configuration>
-</plugin>
+The `GeocodeService` in `arbiter` uses a k8s service to find the geocode service.  If running locally, you will need to specify a variable `geocodeserviceurl` as a build argument.
+
+Spring Cloud Service Discovery is also used so that the `arbiter` service can call the `forecast` service.  As such, a service registraton server must be running in the environment that you are deploying to.  When you are running in Azure Spring Apps, the registration server is provided for you.  When running locally, you will need to run the module `discoveryserver` in this application.
+
+## Deploying to Azure Spring Apps
+
+To deploy an app to Azure Spring Apps, you first need to create the application:
 ```
-Where the property ``${docker.image.prefix}`` was the repository that I created.
-
-### Secret Management
-
-I used native secrets in kubernetes.  I used the command line from CloudShell in AKS and executed the command:
-
-```kubectl create secret generic omw-openweather-apikey --from-literal=openweatherapikey=<your_api_key>```
-
-This value is used when injecting an environment variable to a pod.  Specifically with the yml
-
-```yml
-valueFrom:
-    secretKeyRef:
-      name: omw-openweather-apikey
-      key: openweatherapikey
-      optional: false
+az spring app create --name forecast --instance-count 1 --memory 2Gi --runtime-version Java_17 
+```
+After creating the app you can deploy by specifying the path the the Spring Boot .jar
+```
+az spring app deploy --name forecast --artifact-path ./target/forecast-0.0.1-SNAPSHOT.jar --jvm-options="-Xms2048m -Xmx2048m"
 ```
 
-### Kubernetes
+## Secret Management
 
-[Azure Kubernetes Services](https://azure.microsoft.com/en-us/services/kubernetes-service/) (AKS) can be configured loading the configuration located in ``k8s_all_objects.yml``.  If the images are uploaded and the secret is created then the yml should need no additional changes.
-
-The external IP for the application can be found by executing this command from Cloud Shell ``kubectl get service omw-arbiter``
-
-
-
+At this time I manually enter the API key for OpenWeather via the Azure console after creating the application.
 

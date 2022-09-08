@@ -28,7 +28,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Route
 public class MainView extends VerticalLayout {
 
-	@Value("${arbiterserviceurl:omw-arbiter}")
+	@Value("${arbiterserviceurl:arbiter}")
 	private String arbiterServiceUrl;
 
 	@Value("${arbiterserviceport:#{null}}")

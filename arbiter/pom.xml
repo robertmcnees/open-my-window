@@ -14,8 +14,6 @@
 	<name>arbiter</name>
 	<description>Entry web service</description>
 	<properties>
-		<docker.image.prefix>rjmregistry.azurecr.io</docker.image.prefix>
-		<jib-maven-plugin.version>3.2.1</jib-maven-plugin.version>
 		<java.version>17</java.version>
 		<spring-cloud.version>2021.0.3</spring-cloud.version>
 	</properties>
@@ -56,19 +54,6 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<artifactId>jib-maven-plugin</artifactId>
-				<groupId>com.google.cloud.tools</groupId>
-				<version>${jib-maven-plugin.version}</version>
-				<configuration>
-					<from>
-						<image>mcr.microsoft.com/java/jdk:17-zulu-alpine</image>
-					</from>
-					<to>
-						<image>rjmregistry.azurecr.io/arbiter</image>
-					</to>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
