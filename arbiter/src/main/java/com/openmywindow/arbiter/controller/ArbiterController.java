@@ -11,6 +11,7 @@ import com.openmywindow.arbiter.util.ArbiterHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,6 +25,9 @@ public class ArbiterController {
 	private final ArbiterEngine engine = new ArbiterEngine();
 	private final GeocodeService geocodeService;
 	private final ForecastService forecastService;
+
+	@Value("${COMFORTABLE_TEMPERATURE}")
+	private String COMFORTABLE_TEMP;
 
 	public ArbiterController(GeocodeService geocodeService, ForecastService forecastService) {
 		this.geocodeService = geocodeService;
@@ -39,6 +43,16 @@ public class ArbiterController {
 	public String getCoordinates(@RequestParam String postalCode) {
 		GeocodeCoordinates coordinates = geocodeService.getGeocodeCoordinates(postalCode, "US");
 		return ("lat=" + coordinates.lat() + " : lon=" + coordinates.lon());
+	}
+
+	@GetMapping("forecast")
+	public ForecastRecord getForecast(@RequestParam Double lat, @RequestParam Double lon) {
+		return forecastService.getCurrentWeather(lat, lon);
+	}
+
+	@GetMapping("comfortableTemp")
+	public String getComfortableTemp() {
+		return COMFORTABLE_TEMP;
 	}
 
 	@GetMapping("window")
