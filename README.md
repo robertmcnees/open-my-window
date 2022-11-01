@@ -10,7 +10,7 @@ Outside calls are made to the [OpenWeather API](https://openweathermap.org/api).
 
 # Azure Spring Apps
 
-This branch exists to showcase how to build and applications specifically tailored for [Azure Spring Apps](https://azure.microsoft.com/en-us/services/spring-apps/).
+This application is designed to be seamless run either locally or on [Azure Spring Apps](https://azure.microsoft.com/en-us/services/spring-apps/).
 
 ### Service Discovery
 
@@ -33,11 +33,18 @@ In the example below when running in Azure Spring Apps no variable `geocodeservi
 
 The `ForecastService` class in `arbiter` will use the instance of `forecast` registered with the service registration.  A `DiscoveryClient` is injected into the constructor of this class to find the instance.  The `ForecastApplication` is annotated with `@EnableEurekaClient` to register itself.
 
-## Running Locally
+### External Configuration
 
-The `GeocodeService` in `arbiter` uses a k8s service to find the geocode service.  If running locally, you will need to specify a variable `geocodeserviceurl` as a build argument.
+`aribter` pulls configuration from a [GitHub repository](https://github.com/robertmcnees/open-my-window-config) specifically designed to hold externalized configuration.  This is accomplished by including the config starter in the `pom.xml`.
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-config</artifactId>
+</dependency>
+```
 
-Spring Cloud Service Discovery is also used so that the `arbiter` service can call the `forecast` service.  As such, a service registraton server must be running in the environment that you are deploying to.  When you are running in Azure Spring Apps, the registration server is provided for you.  When running locally, you will need to run the module `discoveryserver` in this application.
+Azure Spring Apps [allows you to specify the details](https://learn.microsoft.com/en-us/azure/spring-apps/how-to-config-server#attach-your-config-server-repository-to-azure-spring-apps) for the implicit configuration server.
+
 
 ## Deploying to Azure Spring Apps
 
@@ -53,4 +60,24 @@ az spring app deploy --name forecast --artifact-path ./target/forecast-0.0.1-SNA
 ## Secret Management
 
 At this time I manually enter the API key for OpenWeather via the Azure console after creating the application.
+
+## Running Locally
+
+Azure Spring Apps provides 2 pieces of functionality that we need to replicate in a local environment.  Mainly how services communicate with one another and how external configuration is loaded
+
+### Service Communication
+
+The `GeocodeService` in `arbiter` uses a k8s service to find the geocode service.  If running locally, you will need to specify a variable `geocodeserviceurl` as a build argument.
+
+Spring Cloud Service Discovery is also used so that the `arbiter` service can call the `forecast` service.  As such, a service registraton server must be running in the environment that you are deploying to.  When you are running in Azure Spring Apps, the registration server is provided for you.  When running locally, you will need to run the module `discoveryserver` in this application.
+
+The 2 methods were used as a way to demonstrate multiple ways services can communicate in Azure Spring Apps.
+
+### External Configuration
+
+Azure Spring Apps provides a configuration service for us out of the box.  That is not true in our local environments, so we need to supply our own configuration server.  This config server will be the intermediary between an application that needs external configuration (i.e. `arbiter`) and the configuration (i.e. the GitHub repository).
+
+The `configserver` module provides this intermediary functionality.'  This deployment is only required when running locally.
+
+Similarly, we must tell the `arbiter` application to look for the config server locally.  To do this set the active profile to local by using the command line argument `-Dspring.profiles.active=local` when running the application.  This will use the `application-local.properties` file that will tell `arbiter` where to find the `configserver`.
 

@@ -26,7 +26,7 @@ public class ArbiterController {
 	private final GeocodeService geocodeService;
 	private final ForecastService forecastService;
 
-	@Value("${COMFORTABLE_TEMPERATURE}")
+	@Value("${COMFORTABLE_TEMPERATURE:298}")
 	private String COMFORTABLE_TEMP;
 
 	public ArbiterController(GeocodeService geocodeService, ForecastService forecastService) {
