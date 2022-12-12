@@ -2,7 +2,7 @@ open-my-window seeks to provide the answer to a seemingly simple question.  "Sho
 
 ## Overview
 
-The project is largely intended to be a personal sandbox for exploration with various tech.  Things may get a bit over-engineered at times in the spirit of learning new tech.  I will start with what I want to learn and then try to find a place for it inside this project.
+The project is largely intended to be a personal sandbox for exploration with various tech.  Things may get a bit over-engineered at times in the spirit of learning new things.  I will start with what I want to learn and then try to find a place for it inside this project.
 
 The entry point to the project is through the ``arbiter`` module, specifically through the endpoint ``/arbiter/window?postalCode=<postalCode>``.  ``arbiter`` will call ``geocode`` to get the coordinates for a given postal code.  Those coordinates are passed to ``forecast`` to obtain the weather data.  ``arbiter`` is responsible for parsing that data and making the final determination if your should open your window.  
 
@@ -28,10 +28,30 @@ In the example below when running in Azure Spring Apps no variable `geocodeservi
 	@Value("${geocodeserviceurl:geocode}")
 	private String geocodeServiceUrl;
 ```
+```java
+	public GeocodeCoordinates getGeocodeCoordinates(String postalCode, String countryCode) {
+		log.info("Geocode URL" + geocodeServiceUrl);
+		return restTemplate.getForObject("http://" + geocodeServiceUrl + "/geocode/coordinates?postalCode=" + postalCode + "&countryCode=" + countryCode,
+				GeocodeCoordinates.class);
+	}
+```
 
 2. Use Spring Cloud Service Registration
 
 The `ForecastService` class in `arbiter` will use the instance of `forecast` registered with the service registration.  A `DiscoveryClient` is injected into the constructor of this class to find the instance.  The `ForecastApplication` is annotated with `@EnableEurekaClient` to register itself.
+
+```java
+	public ForecastService(RestTemplateBuilder restTemplateBuilder, DiscoveryClient discoveryClient) {
+		this.restTemplate = restTemplateBuilder.build();
+		this.discoveryClient = discoveryClient;
+	}
+
+	public ForecastRecord getCurrentWeather(Double lat, Double lon) {
+		ServiceInstance serviceInstance = discoveryClient.getInstances("forecast").get(0);
+		return restTemplate.getForObject("http://" + serviceInstance.getUri().getHost() + ":" + serviceInstance.getUri().getPort()
+				+ "/forecast/forecastWeather?lat="+lat+"&lon="+lon, ForecastRecord.class);
+	}
+```
 
 ### External Configuration
 
