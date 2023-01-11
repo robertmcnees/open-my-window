@@ -9,8 +9,21 @@ public class ArbiterHelper {
 
 	private static final SimpleDateFormat dateOnlySimpleDateFormat = new SimpleDateFormat("yyyyMMdd hh a");
 
+	public static String printFromKelvin(Double temp, TemperatureScale scale) {
+		switch (scale) {
+		case F: return printFahrenheitFromKelvin(temp);
+		case C: return printCelsiusFromKelvin(temp);
+		}
+		return Double.toString(temp);
+	}
+
 	public static String printFahrenheitFromKelvin(Double temp) {
 		Double fahrenheitTemp = convertKelvinToFahrenheit(temp);
+		return Integer.toString(fahrenheitTemp.intValue());
+	}
+
+	public static String printCelsiusFromKelvin(Double temp) {
+		Double fahrenheitTemp = convertKelvinToCelsius(temp);
 		return Integer.toString(fahrenheitTemp.intValue());
 	}
 

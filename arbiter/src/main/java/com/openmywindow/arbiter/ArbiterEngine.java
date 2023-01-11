@@ -1,5 +1,7 @@
 package com.openmywindow.arbiter;
 
+import java.text.DecimalFormat;
+
 import com.openmywindow.arbiter.domain.TemperatureScale;
 import com.openmywindow.arbiter.domain.WindowRecommendation;
 import com.openmywindow.arbiter.record.ForecastRecord;
@@ -13,6 +15,8 @@ public class ArbiterEngine {
 	private static final Logger log = LoggerFactory.getLogger(ArbiterEngine.class);
 
 	private static final Double COLD_TEMP_OFFSET_KELVIN = 7.0;
+
+	private static DecimalFormat decimalFormat = new DecimalFormat("#.#");
 
 	public WindowRecommendation determineComplexMessage(ForecastRecord forecastRecord, Double comfortableTemperature,
 			Double comfortableHumidity, TemperatureScale displayTemperatureScale) {
@@ -35,9 +39,9 @@ public class ArbiterEngine {
 	}
 
 	private void populateCurrentWeatherInformation(WindowRecommendation windowRecommendation, ForecastRecord forecastRecord, TemperatureScale displayTemperatureScale) {
-		windowRecommendation.setCurrentTemp(ArbiterHelper.convertKelvinTemperature(forecastRecord.temp(), displayTemperatureScale));
-		windowRecommendation.setDailyHighTemp(ArbiterHelper.convertKelvinTemperature(forecastRecord.maxTemp(), displayTemperatureScale));
-		windowRecommendation.setDailyLowTemp(ArbiterHelper.convertKelvinTemperature(forecastRecord.minTemp(), displayTemperatureScale));
+		windowRecommendation.setCurrentTemp(Math.floor(ArbiterHelper.convertKelvinTemperature(forecastRecord.temp(), displayTemperatureScale)*100/100));
+		windowRecommendation.setDailyHighTemp(Math.floor(ArbiterHelper.convertKelvinTemperature(forecastRecord.maxTemp(), displayTemperatureScale)*100/100));
+		windowRecommendation.setDailyLowTemp(Math.floor(ArbiterHelper.convertKelvinTemperature(forecastRecord.minTemp(), displayTemperatureScale)*100/100));
 		windowRecommendation.setCurrentHumidity(forecastRecord.humidity());
 	}
 
@@ -84,13 +88,13 @@ public class ArbiterEngine {
 			if (hourlyForecast.temp() > comfortableTemperature || hourlyForecast.humidity() > comfortableHumidity) {
 				foundATimeToClose = true;
 				windowRecommendation.setNextRecommendation("Consider closing your window around " + ArbiterHelper.convertToDateAndHour(hourlyForecast.dateTime())
-						+ " when the temp will be " + ArbiterHelper.convertKelvinTemperature(hourlyForecast.temp(), displayTemperatureScale)
+						+ " when the temp will be " + ArbiterHelper.printFromKelvin(hourlyForecast.temp(), displayTemperatureScale)
 						+ " and the humidity will be " + hourlyForecast.humidity() + ".");
 				break;
 			}
 		}
 
-		if(!foundATimeToClose && lastTimeEvaluated != null) {
+		if (!foundATimeToClose && lastTimeEvaluated != null) {
 			windowRecommendation.setNextRecommendation("Nothing in the forecast before " + ArbiterHelper.convertToDateAndHour(lastTimeEvaluated) + " shows a good time to close your window.");
 		}
 
@@ -103,16 +107,29 @@ public class ArbiterEngine {
 		for (HourlyForecastRecord hourlyForecast : forecastRecord.hourlyForecastList()) {
 			log.info("hourly forecast: " + ArbiterHelper.convertToDateAndHour(hourlyForecast.dateTime()) + " : temp=" + ArbiterHelper.printFahrenheitFromKelvin(hourlyForecast.temp()) + " : humidity=" + hourlyForecast.humidity());
 			lastTimeEvaluated = hourlyForecast.dateTime();
-			if (hourlyForecast.temp() < comfortableTemperature && hourlyForecast.humidity() <= comfortableHumidity) {
-				foundATimeToOpen = true;
+
+			// if it is too cold right now to open the window, wait for it to warm up
+			if (forecastRecord.temp() < comfortableTemperature - COLD_TEMP_OFFSET_KELVIN) {
+				if (hourlyForecast.temp() > comfortableTemperature && hourlyForecast.humidity() <= comfortableHumidity) {
+					foundATimeToOpen = true;
+				}
+			}
+			else {
+				if (hourlyForecast.temp() < comfortableTemperature && hourlyForecast.humidity() <= comfortableHumidity) {
+					foundATimeToOpen = true;
+				}
+			}
+
+			if (foundATimeToOpen) {
 				windowRecommendation.setNextRecommendation("Consider opening your window around " + ArbiterHelper.convertToDateAndHour(hourlyForecast.dateTime())
-						+ " when the temp will be " + ArbiterHelper.convertKelvinTemperature(hourlyForecast.temp(), displayTemperatureScale)
+						+ " when the temp will be " + ArbiterHelper.printFromKelvin(hourlyForecast.temp(), displayTemperatureScale)
 						+ " and the humidity will be " + hourlyForecast.humidity() + ".");
 				break;
 			}
+
 		}
 
-		if(!foundATimeToOpen && lastTimeEvaluated != null) {
+		if (!foundATimeToOpen && lastTimeEvaluated != null) {
 			windowRecommendation.setNextRecommendation("Nothing in the forecast before " + ArbiterHelper.convertToDateAndHour(lastTimeEvaluated) + " shows a good time to open your window.");
 		}
 	}
