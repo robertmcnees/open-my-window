@@ -22,7 +22,7 @@ public class ArbiterControllerTests {
 
 	@Test
 	public void testMethodShouldReturnValue() {
-		String response = this.restTemplate.getForObject("http://localhost:" + port + "/arbiter/test", String.class);
+		String response = this.restTemplate.getForObject("http://localhost:" + port + "/window/test", String.class);
 		assertEquals(response, "hello window");
 	}
 
