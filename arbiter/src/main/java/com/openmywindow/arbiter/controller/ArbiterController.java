@@ -36,7 +36,7 @@ public class ArbiterController {
 		this.forecastService = forecastService;
 	}
 
-	@GetMapping("v2/{countryCode}/{postalCode}")
+	@GetMapping("{countryCode}/{postalCode}")
 	public WindowStatus calculateUnitedStatesWindowRecommendation(@PathVariable String postalCode, @PathVariable String countryCode, @RequestParam(defaultValue = "F", required = false) TemperatureScale units) {
 
 		GeocodeCoordinates coordinates = geocodeService.getGeocodeCoordinates(postalCode, countryCode);
