@@ -2,13 +2,11 @@ package com.openmywindow.arbiter.controller;
 
 import com.openmywindow.arbiter.ArbiterEngine;
 import com.openmywindow.arbiter.domain.TemperatureScale;
-import com.openmywindow.arbiter.domain.WindowRecommendation;
 import com.openmywindow.arbiter.record.ForecastRecord;
 import com.openmywindow.arbiter.record.GeocodeCoordinates;
+import com.openmywindow.arbiter.record.WindowStatus;
 import com.openmywindow.arbiter.service.ForecastService;
 import com.openmywindow.arbiter.service.GeocodeService;
-import com.openmywindow.arbiter.util.ArbiterHelper;
-import jakarta.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,22 +29,20 @@ public class ArbiterController {
 	@Value("${COMFORTABLE_TEMPERATURE:298}")
 	private String COMFORTABLE_TEMP;
 
-	@Value("${COMFORTABLE_HUMIDITY:100}")
-	private String COMFORTABLE_HUMIDITY;
 
 	public ArbiterController(GeocodeService geocodeService, ForecastService forecastService) {
 		this.geocodeService = geocodeService;
 		this.forecastService = forecastService;
 	}
 
-	@GetMapping("{countryCode}/{postalCode}")
-	public WindowRecommendation calculateUnitedStatesWindowRecommendation(@PathVariable String postalCode,
+	@GetMapping("v2/{countryCode}/{postalCode}")
+	public WindowStatus calculateUnitedStatesWindowRecommendation(@PathVariable String postalCode,
 			@PathVariable String countryCode,
-			@RequestParam(defaultValue = "F", required = false) TemperatureScale units) {
+			@RequestParam(defaultValue = "K", required = false) TemperatureScale units) {
 
 		GeocodeCoordinates coordinates = geocodeService.getGeocodeCoordinates(postalCode, countryCode);
 		ForecastRecord forecast = forecastService.getCurrentWeather(coordinates.lat(), coordinates.lon());
-		return engine.determineComplexMessage(forecast, Double.parseDouble(COMFORTABLE_TEMP), Double.parseDouble(COMFORTABLE_HUMIDITY), units);
+		return engine.determineWindowStatus(forecast, Double.parseDouble(COMFORTABLE_TEMP));
 	}
 
 	// ************************************
@@ -74,8 +70,4 @@ public class ArbiterController {
 		return COMFORTABLE_TEMP;
 	}
 
-	@GetMapping("comfortableHumidity")
-	public String getComfortableHumidity() {
-		return COMFORTABLE_HUMIDITY;
-	}
 }

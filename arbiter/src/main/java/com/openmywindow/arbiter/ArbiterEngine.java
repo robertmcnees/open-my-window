@@ -1,11 +1,15 @@
 package com.openmywindow.arbiter;
 
+import java.awt.Window;
 import java.text.DecimalFormat;
 
 import com.openmywindow.arbiter.domain.TemperatureScale;
 import com.openmywindow.arbiter.domain.WindowRecommendation;
+import com.openmywindow.arbiter.record.CurrentWeather;
 import com.openmywindow.arbiter.record.ForecastRecord;
 import com.openmywindow.arbiter.record.HourlyForecastRecord;
+import com.openmywindow.arbiter.record.WindowChange;
+import com.openmywindow.arbiter.record.WindowStatus;
 import com.openmywindow.arbiter.util.ArbiterHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,124 +18,72 @@ public class ArbiterEngine {
 
 	private static final Logger log = LoggerFactory.getLogger(ArbiterEngine.class);
 
-	private static final Double COLD_TEMP_OFFSET_KELVIN = 7.0;
+	/***
+	 * All temperature calculations and return values are in Kelvin
+	 * @param forecastRecord
+	 * @param comfortableTemperature
+	 * @return
+	 */
+	public WindowStatus determineWindowStatus(ForecastRecord forecastRecord, Double comfortableTemperature) {
+		CurrentWeather currentWeather = new CurrentWeather(forecastRecord.temp(), forecastRecord.maxTemp(), forecastRecord.minTemp());
 
-	private static DecimalFormat decimalFormat = new DecimalFormat("#.#");
+		WindowStatusEnum windowStatusEnum = determineWindowOpenCloseStatus(forecastRecord, comfortableTemperature);
+		WindowChange nextWindowChange = determineNextWindowChange(windowStatusEnum, forecastRecord, comfortableTemperature);
 
-	public WindowRecommendation determineComplexMessage(ForecastRecord forecastRecord, Double comfortableTemperature,
-			Double comfortableHumidity, TemperatureScale displayTemperatureScale) {
-
-		WindowRecommendation windowRecommendation = new WindowRecommendation();
-
-		populateCurrentWeatherInformation(windowRecommendation, forecastRecord, displayTemperatureScale);
-		boolean openWindowByTemperature = processTemperatureDecision(windowRecommendation, forecastRecord, comfortableTemperature);
-		boolean openWindowByHumidity = processHumidityDecision(windowRecommendation, forecastRecord, comfortableHumidity);
-		if (openWindowByTemperature && openWindowByHumidity) {
-			windowRecommendation.setStatus("Open");
-			determineCloseWindowRecommendation(windowRecommendation, forecastRecord, comfortableTemperature, comfortableHumidity, displayTemperatureScale);
-		}
-		else {
-			windowRecommendation.setStatus("Close");
-			determineOpenWindowRecommendation(windowRecommendation, forecastRecord, comfortableTemperature, comfortableHumidity, displayTemperatureScale);
-		}
-
-		return windowRecommendation;
+		return new WindowStatus((windowStatusEnum == WindowStatusEnum.OPEN) ? "Open" : "Close", currentWeather, nextWindowChange);
 	}
 
-	private void populateCurrentWeatherInformation(WindowRecommendation windowRecommendation, ForecastRecord forecastRecord, TemperatureScale displayTemperatureScale) {
-		windowRecommendation.setCurrentTemp(Math.floor(ArbiterHelper.convertKelvinTemperature(forecastRecord.temp(), displayTemperatureScale)*100/100));
-		windowRecommendation.setDailyHighTemp(Math.floor(ArbiterHelper.convertKelvinTemperature(forecastRecord.maxTemp(), displayTemperatureScale)*100/100));
-		windowRecommendation.setDailyLowTemp(Math.floor(ArbiterHelper.convertKelvinTemperature(forecastRecord.minTemp(), displayTemperatureScale)*100/100));
-		windowRecommendation.setCurrentHumidity(forecastRecord.humidity());
-	}
+	private WindowStatusEnum determineWindowOpenCloseStatus(ForecastRecord forecastRecord, Double comfortableTemperature){
 
-	private boolean processTemperatureDecision(WindowRecommendation windowRecommendation, ForecastRecord forecastRecord, Double comfortableTemperature) {
 		// too cold all day
-		if (forecastRecord.maxTemp() < comfortableTemperature - COLD_TEMP_OFFSET_KELVIN) {
-			windowRecommendation.setTempRecommendation("The high temp for today is too cold.");
-			return false;
+		if (forecastRecord.maxTemp() < comfortableTemperature) {
+			log.info("Too cold right now");
+			return WindowStatusEnum.CLOSED_COLD;
 		}
+
 		// too hot right now
-		else if (forecastRecord.temp() > comfortableTemperature) {
-			windowRecommendation.setTempRecommendation("Too hot right now.");
-			return false;
+		if (forecastRecord.temp() > comfortableTemperature) {
+			log.info("Too hot right now");
+			return WindowStatusEnum.CLOSED_HOT;
 		}
+
 		// good scenario to open your window
-		else if (forecastRecord.temp() < comfortableTemperature && forecastRecord.maxTemp() > comfortableTemperature) {
-			windowRecommendation.setTempRecommendation("Open your window.");
-			return true;
+		if (forecastRecord.temp() < comfortableTemperature && forecastRecord.maxTemp() > comfortableTemperature) {
+			log.info("Good scenario to open your window.");
+			return WindowStatusEnum.OPEN;
 		}
 
-		windowRecommendation.setTempRecommendation("???? - No scenario found for your weather");
-		return false;
+		log.info("No scenario defined");
+		return null;
 	}
 
-	private boolean processHumidityDecision(WindowRecommendation windowRecommendation, ForecastRecord forecastRecord, Double comfortableHumidity) {
+	private WindowChange determineNextWindowChange(WindowStatusEnum windowStatusEnum, ForecastRecord forecastRecord, Double comfortableTemperature) {
 
-		if(forecastRecord.humidity() > comfortableHumidity) {
-			windowRecommendation.setHumidityRecommendation("Too humid");
-			return false;
-		}
-
-		windowRecommendation.setHumidityRecommendation("Humidity OK");
-		return true;
-
-	}
-
-	private void determineCloseWindowRecommendation(WindowRecommendation windowRecommendation, ForecastRecord forecastRecord,
-			Double comfortableTemperature, Double comfortableHumidity, TemperatureScale displayTemperatureScale) {
-		boolean foundATimeToClose = false;
-		Long lastTimeEvaluated = null;
 		for (HourlyForecastRecord hourlyForecast : forecastRecord.hourlyForecastList()) {
 			log.info("hourly forecast: " + ArbiterHelper.convertToDateAndHour(hourlyForecast.dateTime()) + " : temp=" + ArbiterHelper.printFahrenheitFromKelvin(hourlyForecast.temp()) + " : humidity=" + hourlyForecast.humidity());
-			lastTimeEvaluated = hourlyForecast.dateTime();
-			if (hourlyForecast.temp() > comfortableTemperature || hourlyForecast.humidity() > comfortableHumidity) {
-				foundATimeToClose = true;
-				windowRecommendation.setNextRecommendation("Consider closing your window around " + ArbiterHelper.convertToDateAndHour(hourlyForecast.dateTime())
-						+ " when the temp will be " + ArbiterHelper.printFromKelvin(hourlyForecast.temp(), displayTemperatureScale)
-						+ " and the humidity will be " + hourlyForecast.humidity() + ".");
-				break;
-			}
-		}
 
-		if (!foundATimeToClose && lastTimeEvaluated != null) {
-			windowRecommendation.setNextRecommendation("Nothing in the forecast before " + ArbiterHelper.convertToDateAndHour(lastTimeEvaluated) + " shows a good time to close your window.");
-		}
-
-	}
-
-	private void determineOpenWindowRecommendation(WindowRecommendation windowRecommendation, ForecastRecord forecastRecord,
-			Double comfortableTemperature, Double comfortableHumidity, TemperatureScale displayTemperatureScale) {
-		boolean foundATimeToOpen = false;
-		Long lastTimeEvaluated = null;
-		for (HourlyForecastRecord hourlyForecast : forecastRecord.hourlyForecastList()) {
-			log.info("hourly forecast: " + ArbiterHelper.convertToDateAndHour(hourlyForecast.dateTime()) + " : temp=" + ArbiterHelper.printFahrenheitFromKelvin(hourlyForecast.temp()) + " : humidity=" + hourlyForecast.humidity());
-			lastTimeEvaluated = hourlyForecast.dateTime();
-
-			// if it is too cold right now to open the window, wait for it to warm up
-			if (forecastRecord.temp() < comfortableTemperature - COLD_TEMP_OFFSET_KELVIN) {
-				if (hourlyForecast.temp() > comfortableTemperature && hourlyForecast.humidity() <= comfortableHumidity) {
-					foundATimeToOpen = true;
-				}
-			}
-			else {
-				if (hourlyForecast.temp() < comfortableTemperature && hourlyForecast.humidity() <= comfortableHumidity) {
-					foundATimeToOpen = true;
-				}
+			// Window is open and we found a time that it will get too hot
+			if (windowStatusEnum == WindowStatusEnum.OPEN && hourlyForecast.temp() > comfortableTemperature) {
+				return new WindowChange("Close", hourlyForecast.dateTime(), hourlyForecast.temp());
 			}
 
-			if (foundATimeToOpen) {
-				windowRecommendation.setNextRecommendation("Consider opening your window around " + ArbiterHelper.convertToDateAndHour(hourlyForecast.dateTime())
-						+ " when the temp will be " + ArbiterHelper.printFromKelvin(hourlyForecast.temp(), displayTemperatureScale)
-						+ " and the humidity will be " + hourlyForecast.humidity() + ".");
-				break;
+			// Window is open and we found a time that it will get too cold
+			if (windowStatusEnum == WindowStatusEnum.OPEN && hourlyForecast.temp() < comfortableTemperature - 7) {
+				return new WindowChange("Close", hourlyForecast.dateTime(), hourlyForecast.temp());
+			}
+
+			// Window is closed because it is too cold outside and we found a time it will warm up
+			if (windowStatusEnum == WindowStatusEnum.CLOSED_COLD && hourlyForecast.temp() > comfortableTemperature - 7) {
+				return new WindowChange("Open", hourlyForecast.dateTime(), hourlyForecast.temp());
+			}
+
+			// Window is closed because it is too hot outside and we found a time it will cool down
+			if (windowStatusEnum == WindowStatusEnum.CLOSED_HOT && hourlyForecast.temp() < comfortableTemperature) {
+				return new WindowChange("Open", hourlyForecast.dateTime(), hourlyForecast.temp());
 			}
 
 		}
-
-		if (!foundATimeToOpen && lastTimeEvaluated != null) {
-			windowRecommendation.setNextRecommendation("Nothing in the forecast before " + ArbiterHelper.convertToDateAndHour(lastTimeEvaluated) + " shows a good time to open your window.");
-		}
+		return null;
 	}
 
 }
