@@ -8,17 +8,19 @@ import com.openmywindow.arbiter.record.GeocodeCoordinates;
 import com.openmywindow.arbiter.service.ForecastService;
 import com.openmywindow.arbiter.service.GeocodeService;
 import com.openmywindow.arbiter.util.ArbiterHelper;
+import jakarta.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/arbiter")
+@RequestMapping("/window")
 public class ArbiterController {
 
 	private static final Logger log = LoggerFactory.getLogger(ArbiterController.class);
@@ -29,19 +31,36 @@ public class ArbiterController {
 	@Value("${COMFORTABLE_TEMPERATURE:298}")
 	private String COMFORTABLE_TEMP;
 
+	@Value("${COMFORTABLE_HUMIDITY:100}")
+	private String COMFORTABLE_HUMIDITY;
+
 	public ArbiterController(GeocodeService geocodeService, ForecastService forecastService) {
 		this.geocodeService = geocodeService;
 		this.forecastService = forecastService;
 	}
+
+	@GetMapping("{countryCode}/{postalCode}")
+	public WindowRecommendation calculateUnitedStatesWindowRecommendation(@PathVariable String postalCode,
+			@PathVariable String countryCode,
+			@RequestParam(defaultValue = "F", required = false) TemperatureScale units) {
+
+		GeocodeCoordinates coordinates = geocodeService.getGeocodeCoordinates(postalCode, countryCode);
+		ForecastRecord forecast = forecastService.getCurrentWeather(coordinates.lat(), coordinates.lon());
+		return engine.determineComplexMessage(forecast, Double.parseDouble(COMFORTABLE_TEMP), Double.parseDouble(COMFORTABLE_HUMIDITY), units);
+	}
+
+	// ************************************
+	// Test Endpoints
+	// ************************************
 
 	@GetMapping("test")
 	public String controlTest() {
 		return "hello window";
 	}
 
-	@GetMapping("coordinates")
-	public String getCoordinates(@RequestParam String postalCode) {
-		GeocodeCoordinates coordinates = geocodeService.getGeocodeCoordinates(postalCode, "US");
+	@GetMapping("coordinates/{countryCode}/{postalCode}")
+	public String getCoordinates(@PathVariable String postalCode, @PathVariable String countryCode) {
+		GeocodeCoordinates coordinates = geocodeService.getGeocodeCoordinates(postalCode, countryCode);
 		return ("lat=" + coordinates.lat() + " : lon=" + coordinates.lon());
 	}
 
@@ -55,25 +74,8 @@ public class ArbiterController {
 		return COMFORTABLE_TEMP;
 	}
 
-	@GetMapping("window")
-	public WindowRecommendation calculateWindowRecommendation(@RequestParam String postalCode,
-			@RequestParam(defaultValue = "US", required = false) String countryCode,
-			@RequestParam(defaultValue = "297.039", required = false) Double comfortableTemperature,
-			@RequestParam(defaultValue = "100", required = false) Double comfortableHumidity,
-			@RequestParam(defaultValue = "F", required = false) TemperatureScale units) {
-
-		// if the user specified a temperature and a preferred unit then likely they specified the temp in the same unit
-		if(comfortableTemperature != 297.039 && units != TemperatureScale.K) {
-			if(units == TemperatureScale.C) {
-				comfortableTemperature = ArbiterHelper.convertTemperature(comfortableTemperature, TemperatureScale.C, TemperatureScale.K);
-			}
-			else {
-				comfortableTemperature = ArbiterHelper.convertTemperature(comfortableTemperature, TemperatureScale.F, TemperatureScale.K);
-			}
-		}
-
-		GeocodeCoordinates coordinates = geocodeService.getGeocodeCoordinates(postalCode, countryCode);
-		ForecastRecord forecast = forecastService.getCurrentWeather(coordinates.lat(), coordinates.lon());
-		return engine.determineComplexMessage(forecast, comfortableTemperature, comfortableHumidity, units);
+	@GetMapping("comfortableHumidity")
+	public String getComfortableHumidity() {
+		return COMFORTABLE_HUMIDITY;
 	}
 }
