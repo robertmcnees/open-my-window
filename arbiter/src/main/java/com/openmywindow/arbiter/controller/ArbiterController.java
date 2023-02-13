@@ -2,11 +2,12 @@ package com.openmywindow.arbiter.controller;
 
 import com.openmywindow.arbiter.ArbiterEngine;
 import com.openmywindow.arbiter.domain.TemperatureScale;
+import com.openmywindow.arbiter.domain.WindowStatus;
 import com.openmywindow.arbiter.record.ForecastRecord;
 import com.openmywindow.arbiter.record.GeocodeCoordinates;
-import com.openmywindow.arbiter.record.WindowStatus;
 import com.openmywindow.arbiter.service.ForecastService;
 import com.openmywindow.arbiter.service.GeocodeService;
+import com.openmywindow.arbiter.util.ArbiterHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,15 +37,30 @@ public class ArbiterController {
 	}
 
 	@GetMapping("v2/{countryCode}/{postalCode}")
-	public WindowStatus calculateUnitedStatesWindowRecommendation(@PathVariable String postalCode,
-			@PathVariable String countryCode,
-			@RequestParam(defaultValue = "K", required = false) TemperatureScale units) {
+	public WindowStatus calculateUnitedStatesWindowRecommendation(@PathVariable String postalCode, @PathVariable String countryCode, @RequestParam(defaultValue = "F", required = false) TemperatureScale units) {
 
 		GeocodeCoordinates coordinates = geocodeService.getGeocodeCoordinates(postalCode, countryCode);
 		ForecastRecord forecast = forecastService.getCurrentWeather(coordinates.lat(), coordinates.lon());
-		return engine.determineWindowStatus(forecast, Double.parseDouble(COMFORTABLE_TEMP));
+		WindowStatus windowStatus = engine.determineWindowStatus(forecast, Double.parseDouble(COMFORTABLE_TEMP));
+
+		return processTemperatureConversions(windowStatus, units);
 	}
 
+	private WindowStatus processTemperatureConversions(WindowStatus windowStatus, TemperatureScale units) {
+		windowStatus.getCurrentWeather().setCurrentTemp(
+				ArbiterHelper.convertTemperature(windowStatus.getCurrentWeather().getCurrentTemp(),TemperatureScale.K, units));
+		windowStatus.getCurrentWeather().setDailyHighTemp(
+				ArbiterHelper.convertTemperature(windowStatus.getCurrentWeather().getDailyHighTemp(),TemperatureScale.K, units));
+		windowStatus.getCurrentWeather().setDailyLowTemp(
+				ArbiterHelper.convertTemperature(windowStatus.getCurrentWeather().getDailyLowTemp(),TemperatureScale.K, units));
+
+		if(windowStatus.getWindowChange() != null) {
+			windowStatus.getWindowChange().setTemp(
+					ArbiterHelper.convertTemperature(windowStatus.getWindowChange().getTemp(), TemperatureScale.K, units));
+		}
+
+		return windowStatus;
+	}
 	// ************************************
 	// Test Endpoints
 	// ************************************

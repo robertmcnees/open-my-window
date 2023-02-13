@@ -1,15 +1,10 @@
 package com.openmywindow.arbiter;
 
-import java.awt.Window;
-import java.text.DecimalFormat;
-
-import com.openmywindow.arbiter.domain.TemperatureScale;
-import com.openmywindow.arbiter.domain.WindowRecommendation;
-import com.openmywindow.arbiter.record.CurrentWeather;
+import com.openmywindow.arbiter.domain.CurrentWeather;
+import com.openmywindow.arbiter.domain.WindowChange;
+import com.openmywindow.arbiter.domain.WindowStatus;
 import com.openmywindow.arbiter.record.ForecastRecord;
 import com.openmywindow.arbiter.record.HourlyForecastRecord;
-import com.openmywindow.arbiter.record.WindowChange;
-import com.openmywindow.arbiter.record.WindowStatus;
 import com.openmywindow.arbiter.util.ArbiterHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +28,7 @@ public class ArbiterEngine {
 		return new WindowStatus((windowStatusEnum == WindowStatusEnum.OPEN) ? "Open" : "Close", currentWeather, nextWindowChange);
 	}
 
-	private WindowStatusEnum determineWindowOpenCloseStatus(ForecastRecord forecastRecord, Double comfortableTemperature){
+	private WindowStatusEnum determineWindowOpenCloseStatus(ForecastRecord forecastRecord, Double comfortableTemperature) {
 
 		// too cold all day
 		if (forecastRecord.maxTemp() < comfortableTemperature) {

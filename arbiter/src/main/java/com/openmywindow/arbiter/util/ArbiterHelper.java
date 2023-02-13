@@ -1,5 +1,8 @@
 package com.openmywindow.arbiter.util;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -8,6 +11,8 @@ import com.openmywindow.arbiter.domain.TemperatureScale;
 public class ArbiterHelper {
 
 	private static final SimpleDateFormat dateOnlySimpleDateFormat = new SimpleDateFormat("yyyyMMdd hh a");
+
+	private static DecimalFormat decimalFormat = new DecimalFormat("#.#");
 
 	public static String printFromKelvin(Double temp, TemperatureScale scale) {
 		switch (scale) {
@@ -45,6 +50,9 @@ public class ArbiterHelper {
 			else if (toScale == TemperatureScale.C) {
 				return convertKelvinToCelsius(temp);
 			}
+			else {
+				return roundNumber(temp);
+			}
 		}
 
 		if (fromScale == TemperatureScale.C) {
@@ -53,6 +61,9 @@ public class ArbiterHelper {
 			}
 			else if (toScale == TemperatureScale.K) {
 				return convertCelsiusToKelvin(temp);
+			}
+			else {
+				return roundNumber(temp);
 			}
 		}
 
@@ -63,33 +74,39 @@ public class ArbiterHelper {
 			else if (toScale == TemperatureScale.K) {
 				return convertFahrenheitToKelvin(temp);
 			}
+			else {
+				return roundNumber(temp);
+			}
 		}
 
 		return -1.0;
 	}
 
 	private static Double convertFahrenheitToCelsius(Double temp) {
-		return (temp - 32) * 5/9;
+		return roundNumber((temp - 32) * 5/9);
 	}
 
 	private static Double convertCelsiusToFahrenheit(Double temp) {
-		return (temp * 9/5) + 32;
+		return roundNumber((temp * 9/5) + 32);
 	}
 
 	private static Double convertKelvinToFahrenheit(Double temp) {
-		return (temp - 273.15) * 9 / 5 + 32;
+		return roundNumber((temp - 273.15) * 9 / 5 + 32);
 	}
 
 	private static Double convertKelvinToCelsius(Double temp) {
-		return temp - 273.15;
+		return roundNumber(temp - 273.15);
 	}
 
 	private static Double convertCelsiusToKelvin(Double temp) {
-		return temp + 273.15;
+		return roundNumber(temp + 273.15);
 	}
 
 	private static Double convertFahrenheitToKelvin(Double temp) {
-		return (temp - 32) * 5 / 9 + 273.15;
+		return roundNumber((temp - 32) * 5 / 9 + 273.15);
 	}
 
+	private static Double roundNumber(Double number) {
+		return new BigDecimal(number).setScale(1, RoundingMode.FLOOR).doubleValue();
+	}
 }
