@@ -56,11 +56,11 @@ jobs:
 #            --artifact-path .arbiter/target/arbiter-1.0.0-SNAPSHOT.jar
 
       - name: deploy to production with artifact
-          uses: azure/spring-cloud-deploy@v1
-          with:
-            azure-subscription: ${{ env.AZURE_SUBSCRIPTION }}
-            action: Deploy
-            service-name: ${{ env.SPRING_APPS_SERVICE }}
-            app-name: ${{ env.PROJECT_APP }}
-            use-staging-deployment: false
-            package: ${{ env.ASC_PACKAGE_PATH }}/arbiter/**/*.jar
+        uses: azure/spring-cloud-deploy@v1
+        with:
+          azure-subscription: ${{ env.AZURE_SUBSCRIPTION }}
+          action: Deploy
+          service-name: ${{ env.SPRING_APPS_SERVICE }}
+          app-name: ${{ env.PROJECT_APP }}
+          use-staging-deployment: false
+          package: ${{ env.ASC_PACKAGE_PATH }}/arbiter/**/*.jar
