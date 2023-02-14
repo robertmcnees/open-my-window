@@ -7,6 +7,7 @@ env:
   RESOURCE_GROUP: ${{ secrets.RESOURCE_GROUP }}
   PROJECT_APP: arbiter
   ASC_PACKAGE_PATH: ${{ github.workspace }}
+  AZURE_SUBSCRIPTION_NAME: ${{ secrets.SPRING_APPS_SERVICE_NAME }}
 
 jobs:
   build:
@@ -58,7 +59,7 @@ jobs:
       - name: deploy to production with artifact
         uses: azure/spring-apps-deploy@v1
         with:
-          azure-subscription: ${{ secrets.SPRING_APPS_SERVICE }}
+          azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION_NAME }}
           action: Deploy
           service-name: ${{ env.PROJECT_APP }}
           app-name: ${{ env.PROJECT_APP }}
