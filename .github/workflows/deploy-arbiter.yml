@@ -1,0 +1,55 @@
+name: Deploy Arbiter
+
+on: workflow_dispatch
+
+env:
+  SPRING_APPS_SERVICE: ${{ secrets.SPRING_APPS_SERVICE }}
+  RESOURCE_GROUP: ${{ secrets.RESOURCE_GROUP }}
+  PROJECT_APP: arbiter
+
+  jobs:
+    build:
+      name: Deploy Arbiter
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Checkout source code
+          uses: actions/checkout@v3
+
+        - name: Set up JDK 17
+          uses: actions/setup-java@v3
+          with:
+            java-version: '17'
+            distribution: 'temurin'
+            cache: maven
+
+        - name: Build Arbiter with Maven
+          working-directory: ./arbiter
+          run: mvn --batch-mode package
+
+        - name: Set up Azure
+          uses: azure/login@v1
+          with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+        - name: Set up Azure Spring Extension
+          run: az extension add --name spring
+
+        - name: Create app
+          run: |
+            az spring app create \
+            --name ${PROJECT_APP} \
+            --resource-group "$RESOURCE_GROUP" \
+            --instance-count 1 \
+            --assign-endpoint true \
+            --service "$SPRING_APPS_SERVICE"
+          continue-on-error: true
+
+        - name: Deploy
+          run: |
+            az spring app deploy \
+              --name ${PROJECT_APP} \
+              --resource-group "$RESOURCE_GROUP" \
+              --build-env BP_JVM_VERSION=17 \
+              --service "$SPRING_APPS_SERVICE" \
+              --source-path ./arbiter/
