@@ -41,6 +41,7 @@ jobs:
           --name ${PROJECT_APP} \
           --resource-group "$RESOURCE_GROUP" \
           --instance-count 1 \
+          --runtime-version Java_17 \
           --assign-endpoint true \
           --service "$SPRING_APPS_SERVICE"
         continue-on-error: true
@@ -50,6 +51,5 @@ jobs:
           az spring app deploy \
             --name ${PROJECT_APP} \
             --resource-group "$RESOURCE_GROUP" \
-            --build-env BP_JVM_VERSION=17 \
             --service "$SPRING_APPS_SERVICE" \
             --source-path ./arbiter/
