@@ -59,7 +59,7 @@ jobs:
       - name: deploy to production with artifact
         uses: azure/spring-apps-deploy@v1
         with:
-          azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION_NAME }}
+          azure-subscription: ${{ env.AZURE_SUBSCRIPTION_NAME }}
           action: Deploy
           service-name: ${{ env.PROJECT_APP }}
           app-name: ${{ env.PROJECT_APP }}
