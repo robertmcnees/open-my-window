@@ -1,0 +1,41 @@
+name: Arbiter - CI Build
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Build Main Branch
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build Arbiter
+        working-directory: ./arbiter
+        run: mvn --batch-mode package
+
+      - name: Build Forecast
+        working-directory: ./forecast
+        run: mvn --batch-mode package
+
+      - name: Build Geocode
+        working-directory: ./geocode
+        run: mvn --batch-mode package
+
+      - name: Build Config Server
+        working-directory: ./configserver
+        run: mvn --batch-mode package
+
+      - name: Build Discover Server
+        working-directory: ./discoveryserver
+        run: mvn --batch-mode package
