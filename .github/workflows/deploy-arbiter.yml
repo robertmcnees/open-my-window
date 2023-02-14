@@ -52,4 +52,4 @@ jobs:
             --name ${PROJECT_APP} \
             --resource-group "$RESOURCE_GROUP" \
             --service "$SPRING_APPS_SERVICE" \
-            --source-path ./arbiter/
+            --artifact-path .arbiter/target/arbiter-1.0.0-SNAPSHOT.jar
