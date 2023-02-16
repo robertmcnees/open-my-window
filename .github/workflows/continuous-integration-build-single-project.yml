@@ -1,4 +1,4 @@
-name: Arbiter - CI Build
+name: Single Project - CI Build
 
 on:
   workflow_dispatch:
