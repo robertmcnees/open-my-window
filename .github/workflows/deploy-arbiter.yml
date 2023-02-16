@@ -5,7 +5,6 @@ on: workflow_dispatch
 env:
   PROJECT_APP: arbiter
   ASC_PACKAGE_PATH: ${{ github.workspace }}
-  AZURE_SUBSCRIPTION: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
 jobs:
   build:
@@ -32,39 +31,12 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: deploy to production with artifact
+      - name: Deploy Arbiter to ASA
         uses: azure/spring-apps-deploy@v1
         with:
-          azure-subscription: ${{ env.AZURE_SUBSCRIPTION }}
+          azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           action: Deploy
           service-name: ${{ secrets.ASA_SERVICE_INSTANCE_NAME }}
           app-name: ${{ env.PROJECT_APP }}
           use-staging-deployment: false
           package: ${{ env.ASC_PACKAGE_PATH }}/**/*.jar
-
-##########
-## An alternative approach
-##########
-
-#      - name: Set up Azure Spring Extension
-#        run: az extension add --name spring
-
-#      - name: Create app
-#        run: |
-#          az spring app create \
-#          --name ${PROJECT_APP} \
-#          --resource-group "$RESOURCE_GROUP" \
-#          --instance-count 1 \
-#          --runtime-version Java_17 \
-#          --assign-endpoint true \
-#          --service "$SPRING_APPS_SERVICE"
-#        continue-on-error: true
-#
-#      - name: Deploy
-#        run: |
-#          az spring app deploy \
-#            --name ${PROJECT_APP} \
-#            --resource-group "$RESOURCE_GROUP" \
-#            --service "$SPRING_APPS_SERVICE" \
-#            --artifact-path .arbiter/target/arbiter-1.0.0-SNAPSHOT.jar
-
