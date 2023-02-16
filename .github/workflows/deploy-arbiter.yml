@@ -5,7 +5,7 @@ on: workflow_dispatch
 env:
   PROJECT_APP: arbiter
   ASC_PACKAGE_PATH: ${{ github.workspace }}
-  AZURE_SUBSCRIPTION: ${{ secrets.AZURE_SUBSCRIPTION_NAME }}
+  AZURE_SUBSCRIPTION: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
 jobs:
   build:
