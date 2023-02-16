@@ -3,11 +3,9 @@ name: Deploy Arbiter
 on: workflow_dispatch
 
 env:
-  SPRING_APPS_SERVICE: ${{ secrets.SPRING_APPS_SERVICE }}
-  RESOURCE_GROUP: ${{ secrets.RESOURCE_GROUP }}
   PROJECT_APP: arbiter
   ASC_PACKAGE_PATH: ${{ github.workspace }}
-  AZURE_SUBSCRIPTION_NAME: ${{ secrets.SPRING_APPS_SERVICE_NAME }}
+  AZURE_SUBSCRIPTION: ${{ secrets.AZURE_SUBSCRIPTION_NAME }}
 
 jobs:
   build:
@@ -34,8 +32,22 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Set up Azure Spring Extension
-        run: az extension add --name spring
+      - name: deploy to production with artifact
+        uses: azure/spring-apps-deploy@v1
+        with:
+          azure-subscription: ${{ env.AZURE_SUBSCRIPTION }}
+          action: Deploy
+          service-name: ${{ secrets.ASA_SERVICE_INSTANCE_NAME }}
+          app-name: ${{ env.PROJECT_APP }}
+          use-staging-deployment: false
+          package: ${{ env.ASC_PACKAGE_PATH }}/**/*.jar
+
+##########
+## An alternative approach
+##########
+
+#      - name: Set up Azure Spring Extension
+#        run: az extension add --name spring
 
 #      - name: Create app
 #        run: |
@@ -56,12 +68,3 @@ jobs:
 #            --service "$SPRING_APPS_SERVICE" \
 #            --artifact-path .arbiter/target/arbiter-1.0.0-SNAPSHOT.jar
 
-      - name: deploy to production with artifact
-        uses: azure/spring-apps-deploy@v1
-        with:
-          azure-subscription: ${{ secrets.SPRING_APPS_SERVICE }}
-          action: Deploy
-          service-name: ${{ env.PROJECT_APP }}
-          app-name: ${{ env.PROJECT_APP }}
-          use-staging-deployment: false
-          package: ${{ env.ASC_PACKAGE_PATH }}/arbiter/**/*.jar
