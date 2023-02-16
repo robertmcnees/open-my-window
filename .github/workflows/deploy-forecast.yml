@@ -1,0 +1,42 @@
+name: Deploy Forecast
+
+on: workflow_dispatch
+
+env:
+  PROJECT_APP: forecast
+  ASC_PACKAGE_PATH: ${{ github.workspace }}
+
+jobs:
+  build:
+    name: Deploy Forecast
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build Forecast with Maven
+        working-directory: ./forecast
+        run: mvn clean package
+
+      - name: Set up Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy Forecast to ASA
+        uses: azure/spring-apps-deploy@v1
+        with:
+          azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          action: Deploy
+          service-name: ${{ secrets.ASA_SERVICE_INSTANCE_NAME }}
+          app-name: ${{ env.PROJECT_APP }}
+          use-staging-deployment: false
+          package: ${{ env.ASC_PACKAGE_PATH }}/**/*.jar

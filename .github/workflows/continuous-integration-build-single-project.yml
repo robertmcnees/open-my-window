@@ -1,6 +1,15 @@
 name: Arbiter - CI Build
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: project_choice
+        description: Choose which project to build
+        options:
+        - arbiter
+        - forecast
+        - geocode
 
 jobs:
   build:
@@ -18,6 +27,6 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build Arbiter
-        working-directory: ./arbiter
+      - name: Build Project
+        working-directory: ./${{ github.event.inputs.project_choice }}
         run: mvn --batch-mode package
