@@ -1,6 +1,5 @@
 package com.openmywindow.geocode.service;
 
-import com.azure.security.keyvault.secrets.SecretClient;
 import com.openmywindow.geocode.entity.GeocodeEntity;
 import com.openmywindow.geocode.record.GeocodeResponse;
 import com.openmywindow.geocode.record.OpenWeatherGeocodeResponse;
@@ -20,25 +19,13 @@ public class GeocodeService {
 	private final WebClient webClient;
 	private final GeocodeRepository geocodeRepository;
 	private final Logger log = LoggerFactory.getLogger(GeocodeService.class);
-	private final SecretClient secretClient;
 
 	@Value("${SECRET_OPENWEATHER_API_KEY:defaultValue}")
 	private String OPEN_WEATHER_API_KEY;
 
-	private String OPEN_WEATHER_API_KEY_FROM_VAULT;
-	private boolean foundKeyVault = false;
-
-	public GeocodeService(WebClient.Builder builder, GeocodeRepository geocodeRepository, SecretClient secretClient) {
+	public GeocodeService(WebClient.Builder builder, GeocodeRepository geocodeRepository) {
 		this.webClient = builder.baseUrl("http://api.openweathermap.org/geo/1.0").build();
 		this.geocodeRepository = geocodeRepository;
-		this.secretClient = secretClient;
-		try {
-			OPEN_WEATHER_API_KEY_FROM_VAULT = secretClient.getSecret("OPENWEATHERAPIKEY").getValue();
-			foundKeyVault = true;
-		} catch (Exception e) {
-			System.out.println("Error connecting to Azure Key Vault.  Use default API key");
-			System.out.println(e);
-		}
 	}
 
 	public Mono<GeocodeResponse> geocodePostalCode(String postalCode, String countryCode) {
@@ -47,9 +34,10 @@ public class GeocodeService {
 	}
 
 	private Mono<GeocodeResponse> reactiveWebCall(String postalCode, String countryCode) {
+		System.out.println("rjm key = " + OPEN_WEATHER_API_KEY);
 		return webClient
 				.get()
-				.uri("/zip?zip=" + postalCode + "," + countryCode + "&appid=" + ((foundKeyVault) ? OPEN_WEATHER_API_KEY_FROM_VAULT : OPEN_WEATHER_API_KEY))/*OPEN_WEATHER_API_KEY)*/ //secretClient.getSecret("OPENWEATHERAPIKEY"))
+				.uri("/zip?zip=" + postalCode + "," + countryCode + "&appid=" + OPEN_WEATHER_API_KEY)
 				.accept(MediaType.APPLICATION_JSON)
 				.retrieve()
 				.bodyToMono(OpenWeatherGeocodeResponse.class)
