@@ -22,14 +22,14 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build Forecast with Maven
-        working-directory: ./forecast
-        run: mvn clean package
-
       - name: Set up Azure
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Build Forecast with Maven
+        working-directory: ./forecast
+        run: mvn clean package
 
       - name: Deploy Forecast to ASA
         uses: azure/spring-apps-deploy@v1

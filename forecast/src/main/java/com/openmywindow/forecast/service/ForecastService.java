@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.azure.security.keyvault.secrets.SecretClient;
 import com.openmywindow.forecast.record.DailyForecast;
 import com.openmywindow.forecast.record.ForecastResponse;
 import com.openmywindow.forecast.record.HourlyForecast;
@@ -14,18 +15,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+@Component
 public class ForecastService {
 
 	private static final Logger log = LoggerFactory.getLogger(ForecastService.class);
 	private final RestTemplate restTemplate;
+	private final SecretClient secretClient;
+	private final String OPEN_WEATHER_API_KEY_FROM_VAULT;
 
 	@Value("${SECRET_OPENWEATHER_API_KEY:defaultValue}")
 	private String OPEN_WEATHER_API_KEY;
 
-	public ForecastService(RestTemplate restTemplate) {
-		this.restTemplate = restTemplate;
+	public ForecastService(RestTemplateBuilder restTemplateBuilder, SecretClient secretClient) {
+		this.restTemplate = restTemplateBuilder.build();
+		this.secretClient = secretClient;
+		OPEN_WEATHER_API_KEY_FROM_VAULT = secretClient.getSecret("OPENWEATHERAPIKEY").getValue();
 	}
 
 	public ForecastResponse getOpenWeatherApiCurrentWeather(Double lat, Double lon) {
@@ -36,7 +44,7 @@ public class ForecastService {
 								//+ "&exclude=minutely,daily,alerts" //include hourly, current
 								//+ "&exclude=minutely,alerts,hourly" //include current, daily
 								+ "&exclude=minutely,alerts" //include current, daily, hourly
-								+ "&appid=" + OPEN_WEATHER_API_KEY,
+								+ "&appid=" + OPEN_WEATHER_API_KEY_FROM_VAULT,
 						OneCallResponse.class);
 
 
