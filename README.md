@@ -111,4 +111,4 @@ The Azure Spring Apps deployment can be automated by a GitHub Action.  [Here is 
 
 # Secret Management
 
-At this time I manually enter the API key for OpenWeather via the Azure console after creating the application.
+The API key for OpenWeatherAPI is stored in an Azure key vault.  Spring Cloud Azure is used to pull this information from the key vault.
