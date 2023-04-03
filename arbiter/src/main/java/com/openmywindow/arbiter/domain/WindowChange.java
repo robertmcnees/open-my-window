@@ -2,6 +2,7 @@ package com.openmywindow.arbiter.domain;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 public class WindowChange {
 
@@ -45,6 +46,7 @@ public class WindowChange {
 
 		Date date = new Date(dateTimeChange);
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM dd hh a z");
+		simpleDateFormat.setTimeZone(TimeZone.getTimeZone("America/New_York"));
 		return simpleDateFormat.format(date);
 	}
 }
