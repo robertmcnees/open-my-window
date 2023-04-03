@@ -1,9 +1,13 @@
 package com.openmywindow.arbiter.domain;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class WindowChange {
 
 	private String status;
 	private Long dateTimeChange;
+	private String dateTimeReadable;
 	private Double temp;
 
 	public WindowChange(String status, Long dateTimeChange, Double temp) {
@@ -34,5 +38,13 @@ public class WindowChange {
 
 	public void setTemp(Double temp) {
 		this.temp = temp;
+	}
+
+	public String getDateTimeReadable() {
+		if(dateTimeChange == null) return null;
+
+		Date date = new Date(dateTimeChange);
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM dd hh a z");
+		return simpleDateFormat.format(date);
 	}
 }

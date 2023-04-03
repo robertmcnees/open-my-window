@@ -1,5 +1,6 @@
 package com.openmywindow.forecast.service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -40,13 +41,12 @@ public class ForecastService {
 
 		OneCallResponse response =
 				restTemplate.getForObject(
-						"https://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon=" + lon
+						"https://api.openweathermap.org/data/3.0/onecall?lat=" + lat + "&lon=" + lon
 								//+ "&exclude=minutely,daily,alerts" //include hourly, current
 								//+ "&exclude=minutely,alerts,hourly" //include current, daily
 								+ "&exclude=minutely,alerts" //include current, daily, hourly
 								+ "&appid=" + OPEN_WEATHER_API_KEY_FROM_VAULT,
 						OneCallResponse.class);
-
 
 		Double highTemp = response.current().temp();
 		Double lowTemp = response.current().temp();
@@ -54,7 +54,6 @@ public class ForecastService {
 		List<DailyForecast> dailyForecastList = new ArrayList<>();
 		if (response.daily() != null && response.daily().size() > 0) {
 			/// Assuming current date is at index 0.
-			Date dailyForecastDate = new Date(response.daily().get(0).dt() * 1000L);
 			lowTemp = response.daily().get(0).temp().min();
 			highTemp = response.daily().get(0).temp().max();
 
@@ -68,7 +67,7 @@ public class ForecastService {
 		if (response.hourly() != null && response.hourly().size() > 0) {
 			List<OpenWeatherHourly> openWeatherHourlyList = response.hourly();
 			for (OpenWeatherHourly openWeatherHourly : openWeatherHourlyList) {
-				hourlyForecastList.add(new HourlyForecast(openWeatherHourly.dt(), openWeatherHourly.temp(), openWeatherHourly.humidity()));
+				hourlyForecastList.add(new HourlyForecast(openWeatherHourly.dt() * 1000L, openWeatherHourly.temp(), openWeatherHourly.humidity()));
 			}
 		}
 
