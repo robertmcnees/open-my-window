@@ -14,53 +14,9 @@ This application is designed to run either locally or on [Azure Spring Apps](htt
 
 # Service Communication
 
-
-As stated by [Azure Documentation](https://docs.microsoft.com/en-us/azure/spring-cloud/how-to-service-registration?pivots=programming-language-java) regarding service registration and discovery, Azure Spring Apps provides 2 methods to allow your services to find each other.  For demonstration purposes, open-my-window uses both.  arbiter -> geocode will use the kubernetes service and arbiter -> forecast will use Spring Cloud service discovery.
-
-## Azure Spring Apps - Native Kubernetes Service
-1. Kubernetes service names are created automatically
-
-``
-Azure Spring Apps creates a corresponding kubernetes service for every app running in it using app name as the kubernetes service name. So you can invoke calls in one app to another app by using app name in a http/https request like http(s)://{app name}/path.
-``
-
-The `GeocodeService` class in `arbiter` uses this approach.  Since it is using a native k8s service under the hood, it will look very similar to a native k8s solution.
-
-In the example below when running in Azure Spring Apps no variable `geocodeserviceurl` will be provided so the URL will default to `geocode` which is the same as the application name that we wish to call.
-```java
-	@Value("${geocodeserviceurl:geocode}")
-	private String geocodeServiceUrl;
-```
-```java
-	public GeocodeCoordinates getGeocodeCoordinates(String postalCode, String countryCode) {
-		log.info("Geocode URL" + geocodeServiceUrl);
-		return restTemplate.getForObject("http://" + geocodeServiceUrl + "/geocode/coordinates?postalCode=" + postalCode + "&countryCode=" + countryCode,
-				GeocodeCoordinates.class);
-	}
-```
-
 ## Local - Inject URL as Value
 
 When running locally and not in ASA, we need to specify the `geocodeserviceurl` as our local machine will not know how to decipher the URL `http://geocode/...`.  One way to inject this value is by using a command line parameter when running locally, `-Dgeocodeserviceurl=localhost:8081`
-
-## Azure Spring Apps - Spring Cloud Service Registration
-
-2. Use Spring Cloud Service Registration
-
-The `ForecastService` class in `arbiter` will use the instance of `forecast` registered with the service registration.  A `DiscoveryClient` is injected into the constructor of this class to find the instance.
-
-```java
-	public ForecastService(RestTemplateBuilder restTemplateBuilder, DiscoveryClient discoveryClient) {
-		this.restTemplate = restTemplateBuilder.build();
-		this.discoveryClient = discoveryClient;
-	}
-
-	public ForecastRecord getCurrentWeather(Double lat, Double lon) {
-		ServiceInstance serviceInstance = discoveryClient.getInstances("forecast").get(0);
-		return restTemplate.getForObject("http://" + serviceInstance.getUri().getHost() + ":" + serviceInstance.getUri().getPort()
-				+ "/forecast/forecastWeather?lat="+lat+"&lon="+lon, ForecastRecord.class);
-	}
-```
 
 ## Local - Run a local Discovery Server
 When running the project in ASA, the service discovery server will be provided automatically and we can assume that it is available.  When running locally, we need to stand up our own discover server.  For this purpose the `discoveryserver` application is provided in the repository.  Note this deployment is only needed locally and is not required in ASA. 
@@ -75,31 +31,12 @@ When running the project in ASA, the service discovery server will be provided a
 </dependency>
 ```
 
-## Azure Spring Apps
-Azure Spring Apps [allows you to specify the details](https://learn.microsoft.com/en-us/azure/spring-apps/how-to-config-server#attach-your-config-server-repository-to-azure-spring-apps) for the implicit configuration server.
-
 ## Local
 
 When running locally we need to provide our own config server.  The application `configserver` is provided for this purpose.  To run `arbiter` locally and use the local `configserver`, use the 'local' profile when running `arbiter`.  This will load the `application-local.properties` file that has the location of the local configserver.
 
 # Deploying to Azure Spring Apps
 
-Microsoft has [good documentation around Azure Spring Apps](https://learn.microsoft.com/en-us/azure/spring-apps/).  Instead of trying to recreate that I will give my take on the process.
-
-## Manual Deploy
-
-In my opinion the simplest way to deploy an application is through using the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/service-page/azure%20spring%20apps?view=azure-cli-latest) with Azure Spring Apps
-
-When deploying to ASA, you may need to log in first using
-```shell
-az login
-```
-
-After logging in, you need to create the application in ASA that you want to deploy.  This is a 1 time step and does not need to be repeated when performing subsequent version updates.  You will use the [az spring app create](https://learn.microsoft.com/en-us/cli/azure/spring/app?view=azure-cli-latest#az-spring-app-create) command.  Here is a sample based on this project:
-
-```shell
-az spring app create --name forecast --instance-count 1 --memory 2Gi --runtime-version Java_17 
-```
 
 After creating the application on ASA you can deploy by specifying the name of the applicatio you just created path the the Spring Boot .jar.  You will use [az spring app deploy](https://learn.microsoft.com/en-us/cli/azure/spring/app?view=azure-cli-latest#az-spring-app-deploy).  This is another sample based on the app create command above.
 ```
